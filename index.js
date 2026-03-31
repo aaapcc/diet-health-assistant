@@ -1,55 +1,51 @@
-// 饮食健康助手 - 一个 Worker 搞定所有
-
-// GitHub 上的文件地址（替换成你自己的）
-const PUBLIC_URL = "https://raw.githubusercontent.com/aaapcc/diet-health-assistant/main/public.html";
-const ADMIN_URL = "https://raw.githubusercontent.com/aaapcc/diet-health-assistant/main/admin.html";
-
-const ADMIN_PASSWORD = "admin888";
-const INITIAL_FOODS = [
-  { id: "1", name: "鸡胸肉", categoryLevel1: "肉蛋水产类", categoryLevel2: "禽肉类", gi: 0, block: "green", protein: 23, isHighProtein: true }
-];
-
-async function initKV(env) {
-  let foods = await env.DIET_DATA.get("foods", "json");
-  if (!foods) await env.DIET_DATA.put("foods", JSON.stringify(INITIAL_FOODS));
-}
-
-async function fetchFromGitHub(url) {
-  const res = await fetch(url);
-  return await res.text();
-}
-
+// 饮食健康助手 - Worker API（极简版）
 export default {
   async fetch(request, env) {
-    await initKV(env);
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // 公开展示页
-    if (path === '/' || path === '/public') {
-      const html = await fetchFromGitHub(PUBLIC_URL);
-      return new Response(html, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+    // 处理 CORS 预检
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
     }
 
-    // 管理后台
-    if (path === '/admin') {
-      const html = await fetchFromGitHub(ADMIN_URL);
-      return new Response(html, { headers: { "Content-Type": "text/html;charset=utf-8" } });
+    const headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+    // GET 食品列表
+    if (path === "/api/foods" && request.method === "GET") {
+      const foods = await env.DIET_DATA.get("foods", "json") || [];
+      return new Response(JSON.stringify(foods), { headers });
     }
 
-    // API
-    if (path === '/api/foods') {
-      if (request.method === 'GET') {
-        const foods = await env.DIET_DATA.get('foods', 'json') || [];
-        return new Response(JSON.stringify(foods), { headers: { "Content-Type": "application/json" } });
-      }
-      if (request.method === 'POST') {
-        const foods = await request.json();
-        await env.DIET_DATA.put('foods', JSON.stringify(foods));
-        return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
-      }
+    // POST 保存食品列表
+    if (path === "/api/foods" && request.method === "POST") {
+      const foods = await request.json();
+      await env.DIET_DATA.put("foods", JSON.stringify(foods));
+      return new Response(JSON.stringify({ success: true }), { headers });
     }
 
-    return new Response('Not Found', { status: 404 });
+    // GET 分类列表
+    if (path === "/api/categories" && request.method === "GET") {
+      const categories = await env.DIET_DATA.get("categories", "json") || { level1: [] };
+      return new Response(JSON.stringify(categories), { headers });
+    }
+
+    // POST 保存分类列表
+    if (path === "/api/categories" && request.method === "POST") {
+      const categories = await request.json();
+      await env.DIET_DATA.put("categories", JSON.stringify(categories));
+      return new Response(JSON.stringify({ success: true }), { headers });
+    }
+
+    return new Response("Not Found", { status: 404 });
   }
 };

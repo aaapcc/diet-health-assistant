@@ -5,309 +5,1380 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>饮食健康助手 - 数据管理</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui;background:#f3f4f6;padding:20px}
-        .container{max-width:1400px;margin:0 auto}
-        .header{background:white;padding:20px;border-radius:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
-        h1{font-size:24px}
-        .logout-btn{background:#ef4444;color:white;border:none;padding:10px 20px;border-radius:40px;cursor:pointer}
-        .add-btn{background:#10b981;color:white;border:none;padding:10px 20px;border-radius:40px;cursor:pointer;margin-bottom:16px;float:right}
-        table{width:100%;background:white;border-radius:16px;border-collapse:collapse;overflow:hidden}
-        th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb}
-        th{background:#f9fafb}
-        .edit-btn,.delete-btn{padding:4px 12px;border-radius:8px;cursor:pointer;border:none;color:white}
-        .edit-btn{background:#3b82f6}
-        .delete-btn{background:#ef4444}
-        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1000}
-        .modal.show{display:flex}
-        .modal-content{background:white;padding:24px;border-radius:24px;width:90%;max-width:500px}
-        .form-group{margin-bottom:16px}
-        .form-group label{display:block;margin-bottom:6px;font-weight:600}
-        .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px}
-        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        .submit-btn{width:100%;padding:12px;background:#10b981;color:white;border:none;border-radius:40px;cursor:pointer;margin-top:16px}
-        .stats-bar{background:white;padding:12px;border-radius:12px;margin-bottom:20px}
-        .search-input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin-bottom:16px}
-        .filter-row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
-        .filter-group{flex:1}
-        .filter-group select{width:100%;padding:8px;border:1px solid #ddd;border-radius:8px}
-        .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px}
-        .badge-green{background:#d1fae5;color:#065f46}
-        .badge-yellow{background:#fed7aa;color:#92400e}
-        .badge-red{background:#fee2e2;color:#991b1b}
-        .badge-high-protein{background:#dbeafe;color:#1e40af}
-        .pagination{display:flex;justify-content:center;gap:12px;padding:20px;background:white;margin-top:16px;border-radius:12px}
-        .page-btn{padding:8px 16px;border:1px solid #ddd;background:white;border-radius:8px;cursor:pointer}
-        .page-btn.disabled{opacity:0.5}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .login-box h2 {
+            margin-bottom: 24px;
+            color: #1f2937;
+            text-align: center;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        
+        .login-input:focus {
+            border-color: #10b981;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .error-msg {
+            color: #ef4444;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .admin-header h1 {
+            font-size: 24px;
+            color: #1f2937;
+        }
+        
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 60px;
+            display: inline-flex;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+        
+        .tab-btn.active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filters-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        
+        .search-input:focus {
+            border-color: #10b981;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+        
+        .add-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stats-bar {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .food-table-wrapper, .category-table-wrapper {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .edit-btn, .move-up-btn, .move-down-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .move-up-btn, .move-down-btn {
+            background: #6b7280;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fed7aa; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-high-protein { background: #dbeafe; color: #1e40af; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 22px;
+        }
+        
+        .close-modal {
+            font-size: 28px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+        
+        .form-group .readonly-text {
+            background: #f3f4f6;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        
+        .empty-table {
+            text-align: center;
+            padding: 60px;
+            color: #9ca3af;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+        
+        .warning-box h4 {
+            margin-bottom: 8px;
+            color: #92400e;
+        }
+        
+        .food-list {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+        
+        .radio-group {
+            margin: 12px 0;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .confirm-checkbox {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel {
+            background: #f3f4f6;
+            border: none;
+        }
+        
+        .btn-confirm {
+            background: #ef4444;
+            color: white;
+            border: none;
+        }
+        
+        .btn-confirm.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .page-btn:hover:not(.disabled) {
+            background: #f3f4f6;
+            border-color: #10b981;
+        }
+        
+        .page-btn.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            padding: 8px 16px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Toast 提示样式 - 顶部居中 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .toast.success {
+            background: #3b82f6;  /* 蓝色，与主色调绿色区分 */
+        }
+        .toast.error {
+            background: #ef4444;  /* 红色 */
+        }
+        .toast.info {
+            background: #8b5cf6;  /* 紫色 */
+        }
     </style>
 </head>
+<!-- Toast 提示 -->
+<div id="toast" class="toast"></div>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>🥗 饮食健康助手 · 数据管理</h1>
-        <button id="logoutBtn" class="logout-btn">退出登录</button>
-    </div>
-    <div class="filters-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索菜名或别名...">
-        <div class="filter-row">
-            <div class="filter-group"><label>一级分类</label><select id="filterCategory1"><option value="all">全部</option></select></div>
-            <div class="filter-group"><label>二级分类</label><select id="filterCategory2"><option value="all">全部</option></select></div>
-            <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">绿灯</option><option value="yellow">黄灯</option><option value="red">红灯</option></select></div>
-            <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">高蛋白</option><option value="low">非高蛋白</option></select></div>
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2>🔐 管理后台登录</h2>
+            <input type="password" id="passwordInput" class="login-input" placeholder="请输入管理密码">
+            <button onclick="checkLogin()" class="login-btn">登录</button>
+            <div id="loginError" class="error-msg"></div>
         </div>
     </div>
-    <div style="overflow:hidden"><button id="addBtn" class="add-btn">+ 添加食品</button></div>
-    <div class="stats-bar" id="statsBar">加载中...</div>
-    <div class="table-wrapper">
-        <table>
-            <thead><tr><th>菜名</th><th>分类</th><th>GI值</th><th>区块</th><th>蛋白质</th><th>高蛋白</th><th>操作</th></tr></thead>
-            <tbody id="foodTableBody"></tbody>
-        </table>
-        <div id="pagination" class="pagination"></div>
-    </div>
-</div>
-
-<div id="foodModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">添加食品</h3>
-        <form id="foodForm">
-            <input type="hidden" id="foodId">
-            <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
-            <div class="form-group"><label>别名</label><input type="text" id="alias"></div>
-            <div class="form-row"><div class="form-group"><label>一级分类 *</label><select id="categoryLevel1" required><option value="">请选择</option></select></div><div class="form-group"><label>二级分类</label><select id="categoryLevel2"><option value="">请先选择一级分类</option></select></div></div>
-            <div class="form-group"><label>作用/功效</label><textarea id="effect" rows="3"></textarea></div>
-            <div class="form-row"><div class="form-group"><label>GI值</label><input type="number" id="gi"></div><div class="form-group"><label>所属区块</label><select id="block"><option value="green">绿灯</option><option value="yellow">黄灯</option><option value="red">红灯</option></select></div></div>
-            <div class="form-row"><div class="form-group"><label>蛋白质含量(g/100g)</label><input type="number" id="protein" step="0.1"></div><div class="form-group"><label><input type="checkbox" id="isHighProtein"> 高蛋白食品</label></div></div>
-            <button type="submit" class="submit-btn">保存</button>
-        </form>
-    </div>
-</div>
-
-<script>
-// 配置API地址（部署后修改为你的Worker域名）
-const API_BASE = 'https://jk.722999.xyz';
-
-let foods = [], categories = { level1: [] };
-let currentPage = 1, PAGE_SIZE = 10;
-let currentFilterCategory1 = 'all', currentFilterCategory2 = 'all', currentFilterBlock = 'all', currentFilterProtein = 'all', currentSearch = '';
-
-// 登录检查
-function checkAuth() {
-    const sessionAuth = sessionStorage.getItem('admin_auth');
-    if (sessionAuth === 'true') return true;
     
-    const pwd = prompt('请输入管理密码：');
-    if (pwd === 'admin888') {
-        sessionStorage.setItem('admin_auth', 'true');
-        return true;
-    }
-    return false;
-}
+    <div id="adminPanel" style="display: none;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>🥗 饮食健康助手 · 数据管理</h1>
+                <button onclick="logout()" class="logout-btn">退出登录</button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('food')">🍽️ 食品管理</button>
+                <button class="tab-btn" onclick="switchTab('category')">📂 分类管理</button>
+            </div>
+            
+            <div id="foodTab" class="tab-content active">
+                <div class="filters-bar">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索菜名或别名...">
+                    <div class="filter-row">
+                        <div class="filter-group"><label>一级分类</label><select id="filterCategory1"><option value="all">全部</option></select></div>
+                        <div class="filter-group"><label>二级分类</label><select id="filterCategory2"><option value="all">全部</option></select></div>
+                        <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select></div>
+                        <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">🥩 高蛋白</option><option value="low">❌ 非高蛋白</option></select></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button onclick="openFoodModal()" class="add-btn">+ 添加食品</button>
+                </div>
+                
+                <div class="stats-bar" id="statsBar">加载中...</div>
+                
+                <div class="food-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>菜名</th><th>分类</th><th>GI值</th><th>区块</th><th>蛋白质(g/100g)</th><th>高蛋白</th><th>操作</th> </thead>
+                        <tbody id="foodTableBody"></tbody>
+                    </table>
+                    <div id="foodPagination" class="pagination"></div>
+                </div>
+            </div>
+            
+            <div id="categoryTab" class="tab-content">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button onclick="openCategoryModal('level1')" class="add-btn">+ 添加一级分类</button>
+                </div>
+                <div class="category-table-wrapper" id="categoryList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 食品表单模态框 -->
+    <div id="foodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="foodModalTitle">添加食品</h3><span class="close-modal" onclick="closeFoodModal()">&times;</span></div>
+            <form id="foodForm">
+                <input type="hidden" id="foodId">
+                <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
+                <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用空格分隔"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>一级分类 *</label><select id="categoryLevel1" required onchange="updateSubcategories()"><option value="">请选择</option></select></div>
+                    <div class="form-group"><label>二级分类</label><select id="categoryLevel2"><option value="">请先选择一级分类</option></select></div>
+                </div>
+                <div class="form-group"><label>作用/功效</label><textarea id="effect" rows="4"></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>GI值</label><input type="number" id="gi" step="1" oninput="autoSelectBlockByGI()"></div>
+                    <div class="form-group"><label>所属区块 *</label><select id="block"><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select><div class="help-text" id="blockHint"></div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>蛋白质含量 (g/100g)</label><input type="number" id="protein" step="0.1" oninput="autoCheckHighProtein()"></div>
+                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="isHighProtein"><label>🥩 高蛋白食品</label></div><div class="help-text" id="proteinHint">≥10g/100g 会自动勾选</div></div>
+                </div>
+                <button type="submit" class="submit-btn">保存</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 分类表单模态框 -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="categoryModalTitle">添加分类</h3><span class="close-modal" onclick="closeCategoryModal()">&times;</span></div>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId">
+                <input type="hidden" id="categoryType">
+                <input type="hidden" id="parentId">
+                <div id="parentDisplayGroup" class="form-group" style="display:none;">
+                    <label>所属一级分类</label>
+                    <div id="parentDisplay" class="readonly-text"></div>
+                </div>
+                <div class="form-group"><label>分类名称 *</label><input type="text" id="categoryName" required></div>
+                <button type="submit" class="submit-btn">保存</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 删除确认模态框 -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>⚠️ 删除分类</h3><span class="close-modal" onclick="closeDeleteModal()">&times;</span></div>
+            <div id="deleteModalContent"></div>
+            <div class="modal-buttons">
+                <button onclick="closeDeleteModal()" class="btn-cancel">取消</button>
+                <button id="confirmDeleteBtn" class="btn-confirm disabled" disabled>确认删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 显示提示
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            // 成功提示自动加 ✅ 图标
+            if (type === 'success' && !message.startsWith('✅')) {
+                toast.textContent = '✅ ' + message;
+            } else {
+                toast.textContent = message;
+            }
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
 
-function logout() {
-    sessionStorage.removeItem('admin_auth');
-    location.reload();
-}
-
-async function loadData() {
-    try {
-        const [foodsRes, catsRes] = await Promise.all([fetch(API_BASE + '/api/foods'), fetch(API_BASE + '/api/categories')]);
-        foods = await foodsRes.json();
-        categories = await catsRes.json();
-        updateFilterDropdowns();
-        renderFoods();
-    } catch(e) { console.error('加载失败', e); document.getElementById('statsBar').innerHTML = '加载失败'; }
-}
-
-function updateFilterDropdowns() {
-    const level1Select = document.getElementById('filterCategory1');
-    level1Select.innerHTML = '<option value="all">全部</option>';
-    (categories.level1 || []).sort((a,b) => a.order - b.order).forEach(c => {
-        level1Select.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>';
-    });
-    updateFilterCategory2();
-    const level1Select2 = document.getElementById('categoryLevel1');
-    level1Select2.innerHTML = '<option value="">请选择</option>';
-    (categories.level1 || []).sort((a,b) => a.order - b.order).forEach(c => {
-        level1Select2.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>';
-    });
-}
-
-function updateFilterCategory2() {
-    const level1Id = document.getElementById('filterCategory1').value;
-    const level2Select = document.getElementById('filterCategory2');
-    let options = '<option value="all">全部</option>';
-    if (level1Id !== 'all') {
-        const level1 = categories.level1.find(c => c.id === level1Id);
-        if (level1 && level1.subcategories) {
-            level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
-                options += '<option value="' + sub.id + '">' + sub.name + '</option>';
+        // ==================== 配置 ====================
+        const API_BASE = 'https://diet-health-assistant-api.aaqq.site';
+        
+        let foods = [];
+        let categories = { level1: [] };
+        let currentPage = 1;
+        const PAGE_SIZE_FOOD = 10;
+        let currentFilteredFoods = [];
+        let currentDeleteData = null;
+        let currentDeleteType = null;
+        
+        async function loadFoodsFromAPI() {
+            try {
+                const res = await fetch(API_BASE + '/api/foods');
+                foods = await res.json();
+            } catch(e) { console.error('加载食品失败:', e); foods = []; }
+        }
+        
+        async function loadCategoriesFromAPI() {
+            try {
+                const res = await fetch(API_BASE + '/api/categories');
+                categories = await res.json();
+            } catch(e) { console.error('加载分类失败:', e); categories = { level1: [] }; }
+        }
+        
+        async function saveFoodsToAPI() {
+            const token = window.adminToken || sessionStorage.getItem('admin_token');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = 'Basic ' + token;
+            }
+            
+            await fetch(API_BASE + '/api/foods', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(foods)
             });
         }
-    }
-    level2Select.innerHTML = options;
-}
-
-function getFilteredFoods() {
-    let filtered = [...foods];
-    if (currentSearch) filtered = filtered.filter(f => f.name.toLowerCase().includes(currentSearch) || (f.alias || '').toLowerCase().includes(currentSearch));
-    if (currentFilterCategory1 !== 'all') {
-        const level1 = categories.level1.find(c => c.id === currentFilterCategory1);
-        if (level1) filtered = filtered.filter(f => f.categoryLevel1 === level1.name);
-    }
-    if (currentFilterCategory2 !== 'all') {
-        const level1 = categories.level1.find(c => c.id === currentFilterCategory1);
-        if (level1) {
-            const sub = level1.subcategories.find(s => s.id === currentFilterCategory2);
-            if (sub) filtered = filtered.filter(f => f.categoryLevel2 === sub.name);
+        
+        async function saveCategoriesToAPI() {
+            const token = window.adminToken || sessionStorage.getItem('admin_token');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = 'Basic ' + token;
+            }
+            
+            const response = await fetch(API_BASE + '/api/categories', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(categories)
+            });
+            
+            if (response.status === 401) {
+                console.log('认证失败，请重新登录');
+                logout();
+            }
+            return response;
         }
-    }
-    if (currentFilterBlock !== 'all') filtered = filtered.filter(f => f.block === currentFilterBlock);
-    if (currentFilterProtein === 'high') filtered = filtered.filter(f => f.isHighProtein === true);
-    else if (currentFilterProtein === 'low') filtered = filtered.filter(f => f.isHighProtein === false);
-    return filtered;
-}
+        
+        function getFilteredFoods() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filterLevel1 = document.getElementById('filterCategory1').value;
+            const filterLevel2 = document.getElementById('filterCategory2').value;
+            const filterBlock = document.getElementById('filterBlock').value;
+            const filterProtein = document.getElementById('filterProtein').value;
+            
+            let filtered = foods.filter(food => {
+                if (search && !food.name.toLowerCase().includes(search) && !(food.alias || '').toLowerCase().includes(search)) return false;
+                if (filterLevel1 !== 'all') {
+                    const level1 = categories.level1.find(c => c.id === filterLevel1);
+                    if (level1 && food.categoryLevel1 !== level1.name) return false;
+                }
+                if (filterLevel2 !== 'all') {
+                    const level1 = categories.level1.find(c => c.id === filterLevel1);
+                    if (level1) {
+                        const sub = level1.subcategories.find(s => s.id === filterLevel2);
+                        if (sub && food.categoryLevel2 !== sub.name) return false;
+                    }
+                }
+                if (filterBlock !== 'all' && food.block !== filterBlock) return false;
+                if (filterProtein === 'high' && !food.isHighProtein) return false;
+                if (filterProtein === 'low' && food.isHighProtein) return false;
+                return true;
+            });
+            return filtered;
+        }
+        
+        function renderFoods() {
+            currentFilteredFoods = getFilteredFoods();
+            const totalPages = Math.ceil(currentFilteredFoods.length / PAGE_SIZE_FOOD);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            const start = (currentPage - 1) * PAGE_SIZE_FOOD;
+            const pageFoods = currentFilteredFoods.slice(start, start + PAGE_SIZE_FOOD);
+            document.getElementById('statsBar').innerHTML = '共 ' + currentFilteredFoods.length + ' 条食品数据（总计 ' + foods.length + ' 条）';
+            const tbody = document.getElementById('foodTableBody');
+            if (pageFoods.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-table">暂无数据</td></tr>'; document.getElementById('foodPagination').innerHTML = ''; return; }
+            let html = '';
+            for (let f of pageFoods) {
+                const blockClass = f.block === 'green' ? 'badge-green' : (f.block === 'yellow' ? 'badge-yellow' : 'badge-red');
+                const blockText = f.block === 'green' ? '绿灯' : (f.block === 'yellow' ? '黄灯' : '红灯');
+                const proteinDisplay = f.protein ? f.protein + 'g' : '-';
+                const highProteinBadge = f.isHighProtein ? '<span class="badge badge-high-protein">🥩 高蛋白</span>' : '-';
+                html += '<tr>';
+                html += '<td><strong>' + escapeHtml(f.name) + '</strong><br><span style="font-size:12px;color:#9ca3af;">' + escapeHtml(f.alias || '无别名') + '</span></td>';
+                html += '<td>' + escapeHtml(f.categoryLevel1) + (f.categoryLevel2 ? ' > ' + escapeHtml(f.categoryLevel2) : '') + '</td>';
+                html += '<td>' + (f.gi || '-') + '</td>';
+                html += '<td><span class="badge ' + blockClass + '">' + blockText + '</span></td>';
+                html += '<td>' + proteinDisplay + '</td>';
+                html += '<td>' + highProteinBadge + '</td>';
+                html += '<td class="actions"><button class="edit-btn" onclick="editFood(\'' + f.id + '\')">编辑</button> <button class="delete-btn" onclick="deleteFoodItem(\'' + f.id + '\')">删除</button></td>';
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+            renderPagination(totalPages);
+        }
+        
+        function renderPagination(totalPages) {
+            const div = document.getElementById('foodPagination');
+            if (totalPages <= 1) { div.innerHTML = ''; return; }
+            div.innerHTML = '<div class="pagination"><button class="page-btn ' + (currentPage === 1 ? 'disabled' : '') + '" onclick="changePage(' + (currentPage - 1) + ')">上一页</button><span class="page-info">第 ' + currentPage + ' / ' + totalPages + ' 页</span><button class="page-btn ' + (currentPage === totalPages ? 'disabled' : '') + '" onclick="changePage(' + (currentPage + 1) + ')">下一页</button></div>';
+        }
+        
+        function changePage(page) { currentPage = page; renderFoods(); }
+        
+        function updateFilterCategory2Options() {
+            const level1Select = document.getElementById('filterCategory1');
+            const level2Select = document.getElementById('filterCategory2');
+            const selectedLevel1 = level1Select.value;
+            let options = '<option value="all">全部</option>';
+            if (selectedLevel1 !== 'all') {
+                const level1 = categories.level1.find(c => c.id === selectedLevel1);
+                if (level1) {
+                    level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
+                        options += '<option value="' + sub.id + '">' + sub.name + '</option>';
+                    });
+                }
+            }
+            level2Select.innerHTML = options;
+        }
+        
+        function renderCategories() {
+            const container = document.getElementById('categoryList');
+            const sortedLevel1 = [...categories.level1].sort((a,b) => a.order - b.order);
+            if (sortedLevel1.length === 0) {
+                container.innerHTML = '<div class="empty-table">暂无分类，点击"添加一级分类"开始创建</div>';
+                return;
+            }
+            
+            let html = '<table class="food-table"><thead><tr><th>分类名称</th><th>排序</th><th>操作</th></tr></thead><tbody>';
+            
+            for (let i = 0; i < sortedLevel1.length; i++) {
+                const level1 = sortedLevel1[i];
+                const isFirst = i === 0;
+                const isLast = i === sortedLevel1.length - 1;
+                
+                html += '<tr style="background:#f9fafb;">';
+                html += '<td><strong>📁 ' + escapeHtml(level1.name) + '</strong></td>';
+                html += '<td>';
+                html += '<button class="edit-btn" onclick="moveCategory(\'level1\', \'' + level1.id + '\', \'up\')" ' + (isFirst ? 'disabled' : '') + '>↑</button> ';
+                html += '<button class="edit-btn" onclick="moveCategory(\'level1\', \'' + level1.id + '\', \'down\')" ' + (isLast ? 'disabled' : '') + '>↓</button>';
+                html += '</td>';
+                html += '<td class="actions">';
+                html += '<button class="edit-btn" onclick="editCategory(\'level1\', \'' + level1.id + '\')">编辑</button> ';
+                html += '<button class="delete-btn" onclick="deleteCategory(\'level1\', \'' + level1.id + '\')">删除</button> ';
+                html += '<button class="add-btn" style="background:#10b981;" onclick="openCategoryModal(\'level2\', \'' + level1.id + '\')">+ 添加子分类</button>';
+                html += '</td>';
+                html += '</tr>';
+                
+                const sortedSub = [...level1.subcategories].sort((a,b) => a.order - b.order);
+                for (let j = 0; j < sortedSub.length; j++) {
+                    const sub = sortedSub[j];
+                    const isSubFirst = j === 0;
+                    const isSubLast = j === sortedSub.length - 1;
+                    
+                    html += '<tr>';
+                    html += '<td style="padding-left:32px;">📄 ' + escapeHtml(sub.name) + '</td>';
+                    html += '<td>';
+                    html += '<button class="edit-btn" onclick="moveSubcategory(\'' + level1.id + '\', \'' + sub.id + '\', \'up\')" ' + (isSubFirst ? 'disabled' : '') + '>↑</button> ';
+                    html += '<button class="edit-btn" onclick="moveSubcategory(\'' + level1.id + '\', \'' + sub.id + '\', \'down\')" ' + (isSubLast ? 'disabled' : '') + '>↓</button>';
+                    html += '</td>';
+                    html += '<td class="actions">';
+                    html += '<button class="edit-btn" onclick="editCategory(\'level2\', \'' + sub.id + '\', \'' + level1.id + '\')">编辑</button> ';
+                    html += '<button class="delete-btn" onclick="deleteCategory(\'level2\', \'' + sub.id + '\', \'' + level1.id + '\')">删除</button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        async function moveSubcategory(level1Id, subId, direction) {
+            console.log('移动二级分类', level1Id, subId, direction);
+            
+            const level1 = categories.level1.find(c => c.id === level1Id);
+            if (!level1) return;
+            
+            const subs = level1.subcategories;
+            const index = subs.findIndex(s => s.id === subId);
+            
+            if (direction === 'up' && index > 0) {
+                // 交换 order 值
+                const tempOrder = subs[index].order;
+                subs[index].order = subs[index-1].order;
+                subs[index-1].order = tempOrder;
+                // 重新排序
+                subs.sort((a,b) => a.order - b.order);
+            } else if (direction === 'down' && index < subs.length-1) {
+                const tempOrder = subs[index].order;
+                subs[index].order = subs[index+1].order;
+                subs[index+1].order = tempOrder;
+                subs.sort((a,b) => a.order - b.order);
+            } else {
+                return; // 无效移动，直接返回
+            }
+            
+            // 保存到 API（异步，不等待完成才刷新界面）
+            saveCategoriesToAPI().catch(e => console.error('保存失败:', e));
+            
+            // 立即刷新分类列表（不等待保存完成）
+            renderCategories();
+            updateFilterDropdowns();
+            
+            // 显示成功提示
+            showToast('排序已调整', 'success');
+            
+            // 可选：更新食品列表（如果排序影响食品显示）
+            renderFoods();
+        }
+        
+        async function moveCategory(type, id, direction) {
+            console.log('移动一级分类', type, id, direction);
+            
+            if (type === 'level1') {
+                const index = categories.level1.findIndex(c => c.id === id);
+                if (direction === 'up' && index > 0) {
+                    const tempOrder = categories.level1[index].order;
+                    categories.level1[index].order = categories.level1[index-1].order;
+                    categories.level1[index-1].order = tempOrder;
+                    categories.level1.sort((a,b) => a.order - b.order);
+                } else if (direction === 'down' && index < categories.level1.length-1) {
+                    const tempOrder = categories.level1[index].order;
+                    categories.level1[index].order = categories.level1[index+1].order;
+                    categories.level1[index+1].order = tempOrder;
+                    categories.level1.sort((a,b) => a.order - b.order);
+                } else {
+                    return; // 无效移动，直接返回
+                }
+            }
+            
+            // 保存到 API（异步，不等待完成才刷新界面）
+            saveCategoriesToAPI().catch(e => console.error('保存失败:', e));
+            
+            // 立即刷新界面
+            renderCategories();
+            updateFilterDropdowns();
+            
+            // 显示成功提示
+            showToast('排序已调整', 'success');
+            
+            // 可选：更新食品列表
+            renderFoods();
+        }
+        
+        function openFoodModal() {
+            document.getElementById('foodForm').reset();
+            document.getElementById('foodId').value = '';
+            document.getElementById('foodModalTitle').innerText = '添加食品';
+            updateCategoryDropdowns();
+            document.getElementById('foodModal').classList.add('show');
+        }
+        
+        function closeFoodModal() { document.getElementById('foodModal').classList.remove('show'); }
+        
+        function updateCategoryDropdowns() {
+            const level1Select = document.getElementById('categoryLevel1');
+            level1Select.innerHTML = '<option value="">请选择</option>';
+            categories.level1.sort((a,b) => a.order - b.order).forEach(c => {
+                level1Select.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>';
+            });
+            document.getElementById('categoryLevel2').innerHTML = '<option value="">请先选择一级分类</option>';
+        }
+        
+        function updateSubcategories() {
+            const level1Id = document.getElementById('categoryLevel1').value;
+            const level2Select = document.getElementById('categoryLevel2');
+            if (!level1Id) { level2Select.innerHTML = '<option value="">请先选择一级分类</option>'; return; }
+            const level1 = categories.level1.find(c => c.id === level1Id);
+            let html = '<option value="">无</option>';
+            if (level1) {
+                level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
+                    html += '<option value="' + sub.id + '">' + sub.name + '</option>';
+                });
+            }
+            level2Select.innerHTML = html;
+        }
+        
+        function autoSelectBlockByGI() {
+            const gi = parseInt(document.getElementById('gi').value);
+            const block = document.getElementById('block');
+            const hint = document.getElementById('blockHint');
+            if (isNaN(gi)) { hint.innerHTML = ''; return; }
+            if (gi <= 55) { block.value = 'green'; hint.innerHTML = '✨ 根据GI值自动推荐：绿灯食品'; }
+            else if (gi <= 69) { block.value = 'yellow'; hint.innerHTML = '✨ 根据GI值自动推荐：黄灯食品'; }
+            else { block.value = 'red'; hint.innerHTML = '✨ 根据GI值自动推荐：红灯食品'; }
+        }
+        
+        function autoCheckHighProtein() {
+            const protein = parseFloat(document.getElementById('protein').value);
+            const checkbox = document.getElementById('isHighProtein');
+            const hint = document.getElementById('proteinHint');
+            if (!isNaN(protein) && protein >= 10) {
+                checkbox.checked = true;
+                hint.innerHTML = '✅ 蛋白质含量 ≥ 10g/100g，已自动勾选';
+            } else if (!isNaN(protein) && protein > 0) {
+                checkbox.checked = false;
+                hint.innerHTML = '📌 蛋白质含量 < 10g/100g，未自动勾选';
+            } else {
+                hint.innerHTML = '≥10g/100g 会自动勾选，可手动调整';
+            }
+        }
+        
+        function editFood(id) {
+            const food = foods.find(f => f.id === id);
+            if (!food) return;
+            document.getElementById('foodId').value = food.id;
+            document.getElementById('name').value = food.name;
+            document.getElementById('alias').value = food.alias || '';
+            const level1 = categories.level1.find(c => c.name === food.categoryLevel1);
+            if (level1) {
+                document.getElementById('categoryLevel1').value = level1.id;
+                updateSubcategories();
+                const level2 = level1.subcategories.find(s => s.name === food.categoryLevel2);
+                if (level2) document.getElementById('categoryLevel2').value = level2.id;
+            }
+            document.getElementById('effect').value = food.effect || '';
+            document.getElementById('gi').value = food.gi || '';
+            document.getElementById('block').value = food.block;
+            document.getElementById('protein').value = food.protein || '';
+            document.getElementById('isHighProtein').checked = food.isHighProtein;
+            document.getElementById('foodModalTitle').innerText = '编辑食品';
+            document.getElementById('foodModal').classList.add('show');
+        }
+        
+        async function deleteFoodItem(id) {
+            if (!confirm('确定删除这个食品吗？')) return;
+            foods = foods.filter(f => f.id !== id);
+            await saveFoodsToAPI();
+            renderFoods();
+        }
+        
+        async function saveFood(e) {
+            e.preventDefault();
+            const id = document.getElementById('foodId').value;
+            const level1Obj = categories.level1.find(c => c.id === document.getElementById('categoryLevel1').value);
+            const level2Id = document.getElementById('categoryLevel2').value;
+            const level2Obj = level1Obj ? level1Obj.subcategories.find(s => s.id === level2Id) : null;
+            const foodData = {
+                name: document.getElementById('name').value,
+                alias: document.getElementById('alias').value,
+                categoryLevel1: level1Obj ? level1Obj.name : '',
+                categoryLevel2: level2Obj ? level2Obj.name : '',
+                effect: document.getElementById('effect').value,
+                gi: parseInt(document.getElementById('gi').value) || null,
+                block: document.getElementById('block').value,
+                protein: parseFloat(document.getElementById('protein').value) || null,
+                isHighProtein: document.getElementById('isHighProtein').checked
+            };
+            if (id) {
+                const index = foods.findIndex(f => f.id === id);
+                if (index !== -1) { foodData.id = id; foods[index] = foodData; }
+            } else {
+                foodData.id = Date.now().toString();
+                foods.push(foodData);
+            }
+            await saveFoodsToAPI();
+            closeFoodModal();
+            currentPage = 1;
+            renderFoods();
+        }
+        
+        function openCategoryModal(type, parentId = null) {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryType').value = type;
+            document.getElementById('parentId').value = parentId || '';
+            const parentDisplayGroup = document.getElementById('parentDisplayGroup');
+            if (type === 'level2' && parentId) {
+                const level1 = categories.level1.find(c => c.id === parentId);
+                if (level1) {
+                    parentDisplayGroup.style.display = 'block';
+                    document.getElementById('parentDisplay').innerHTML = level1.name;
+                    document.getElementById('categoryModalTitle').innerText = '添加二级分类（' + level1.name + '）';
+                }
+            } else {
+                parentDisplayGroup.style.display = 'none';
+                document.getElementById('categoryModalTitle').innerText = type === 'level1' ? '添加一级分类' : '添加二级分类';
+            }
+            document.getElementById('categoryModal').classList.add('show');
+        }
+        
+        function editCategory(type, id, parentId = null) {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryType').value = type;
+            document.getElementById('parentId').value = parentId || '';
+            const parentDisplayGroup = document.getElementById('parentDisplayGroup');
+            if (type === 'level1') {
+                const level1 = categories.level1.find(c => c.id === id);
+                if (level1) document.getElementById('categoryName').value = level1.name;
+                document.getElementById('categoryModalTitle').innerText = '编辑一级分类';
+                parentDisplayGroup.style.display = 'none';
+            } else {
+                const level1 = categories.level1.find(c => c.id === parentId);
+                if (level1) {
+                    const sub = level1.subcategories.find(s => s.id === id);
+                    if (sub) document.getElementById('categoryName').value = sub.name;
+                    parentDisplayGroup.style.display = 'block';
+                    document.getElementById('parentDisplay').innerHTML = level1.name;
+                    document.getElementById('categoryModalTitle').innerText = '编辑二级分类（' + level1.name + '）';
+                }
+            }
+            document.getElementById('categoryModal').classList.add('show');
+        }
+        
+        function closeCategoryModal() { document.getElementById('categoryModal').classList.remove('show'); }
+        
+        async function saveCategory(e) {
+            e.preventDefault();
+            const type = document.getElementById('categoryType').value;
+            const name = document.getElementById('categoryName').value;
+            if (type === 'level1') {
+                const maxOrder = Math.max(...categories.level1.map(c => c.order), 0);
+                categories.level1.push({ id: Date.now().toString(), name: name, order: maxOrder + 1, subcategories: [] });
+            } else {
+                const parentId = document.getElementById('parentId').value;
+                const level1 = categories.level1.find(c => c.id === parentId);
+                if (level1) {
+                    const maxOrder = Math.max(...level1.subcategories.map(s => s.order), 0);
+                    level1.subcategories.push({ id: Date.now().toString(), name: name, order: maxOrder + 1 });
+                }
+            }
+            await saveCategoriesToAPI();
+            closeCategoryModal();
+            renderCategories();
+            updateFilterDropdowns();
+            renderFoods();
+        }
+        
+        function deleteCategory(type, id, parentId = null) {
+            let foodsInCategory = [];
+            let categoryName = '';
+            if (type === 'level1') {
+                const level1 = categories.level1.find(c => c.id === id);
+                if (level1) {
+                    categoryName = level1.name;
+                    foodsInCategory = foods.filter(f => f.categoryLevel1 === level1.name);
+                }
+            } else {
+                const level1 = categories.level1.find(c => c.id === parentId);
+                if (level1) {
+                    const sub = level1.subcategories.find(s => s.id === id);
+                    if (sub) {
+                        categoryName = sub.name;
+                        foodsInCategory = foods.filter(f => f.categoryLevel2 === sub.name && f.categoryLevel1 === level1.name);
+                    }
+                }
+            }
+            currentDeleteData = { type: type, id: id, parentId: parentId, foods: foodsInCategory, name: categoryName };
+            currentDeleteType = type;
+            const modalContent = document.getElementById('deleteModalContent');
+            if (foodsInCategory.length === 0) {
+                modalContent.innerHTML = '<p>确定要删除分类 "' + categoryName + '" 吗？</p>';
+                document.getElementById('confirmDeleteBtn').disabled = false;
+                document.getElementById('confirmDeleteBtn').classList.remove('disabled');
+                document.getElementById('confirmDeleteBtn').onclick = async function() {
+                    if (currentDeleteType === 'level1') {
+                        categories.level1 = categories.level1.filter(c => c.id !== currentDeleteData.id);
+                    } else {
+                        const level1 = categories.level1.find(c => c.id === currentDeleteData.parentId);
+                        if (level1) level1.subcategories = level1.subcategories.filter(s => s.id !== currentDeleteData.id);
+                    }
+                    await saveCategoriesToAPI();
+                    closeDeleteModal();
+                    renderCategories();
+                    updateFilterDropdowns();
+                    renderFoods();
+                };
+            } else {
+                let foodNames = '';
+                for (let f of foodsInCategory) foodNames += f.name + '、';
+                foodNames = foodNames.slice(0, -1);
+                modalContent.innerHTML = '<div class="warning-box"><h4>⚠️ 该分类下有 ' + foodsInCategory.length + ' 条食品数据</h4><div class="food-list">' + foodNames + '</div></div><div class="radio-group"><label><input type="radio" name="deleteOption" value="move"> 移动到其他分类</label><select id="targetCategory" style="margin-left:24px;margin-top:8px;display:none;"><option value="">请选择</option></select></div><div class="radio-group"><label><input type="radio" name="deleteOption" value="delete"> 全部删除（这些食品将永久删除）</label></div><div class="confirm-checkbox"><input type="checkbox" id="confirmCheckbox"> <label>我已知晓此操作不可撤销</label></div>';
+                const moveRadio = document.querySelector('input[value="move"]');
+                const deleteRadio = document.querySelector('input[value="delete"]');
+                const targetSelect = document.getElementById('targetCategory');
+                const confirmCheckbox = document.getElementById('confirmCheckbox');
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                moveRadio.addEventListener('change', function() {
+                    targetSelect.style.display = 'block';
+                    targetSelect.innerHTML = '<option value="">请选择目标分类</option>';
+                    if (type === 'level1') {
+                        for (let c of categories.level1) {
+                            if (c.id !== id) {
+                                targetSelect.innerHTML += '<option value="level1_' + c.id + '">📁 ' + c.name + '</option>';
+                                for (let sub of c.subcategories) {
+                                    targetSelect.innerHTML += '<option value="level2_' + sub.id + '">📄 ' + c.name + ' > ' + sub.name + '</option>';
+                                }
+                            }
+                        }
+                    } else {
+                        for (let c of categories.level1) {
+                            targetSelect.innerHTML += '<option value="level1_' + c.id + '">📁 ' + c.name + '</option>';
+                            if (c.id !== parentId) {
+                                for (let sub of c.subcategories) {
+                                    targetSelect.innerHTML += '<option value="level2_' + sub.id + '">📄 ' + c.name + ' > ' + sub.name + '</option>';
+                                }
+                            }
+                        }
+                    }
+                });
+                deleteRadio.addEventListener('change', function() { targetSelect.style.display = 'none'; });
+                function checkConfirm() {
+                    confirmBtn.disabled = !confirmCheckbox.checked || !document.querySelector('input[name="deleteOption"]:checked');
+                    if (confirmBtn.disabled) confirmBtn.classList.add('disabled');
+                    else confirmBtn.classList.remove('disabled');
+                }
+                confirmCheckbox.addEventListener('change', checkConfirm);
+                document.querySelectorAll('input[name="deleteOption"]').forEach(radio => radio.addEventListener('change', checkConfirm));
+                confirmBtn.onclick = async function() {
+                    const option = document.querySelector('input[name="deleteOption"]:checked')?.value;
+                    if (option === 'move') {
+                        const targetVal = targetSelect.value;
+                        if (!targetVal) return;
+                        const [targetType, targetId] = targetVal.split('_');
+                        if (targetType === 'level1') {
+                            const targetLevel1 = categories.level1.find(c => c.id === targetId);
+                            if (targetLevel1) {
+                                for (let food of foodsInCategory) {
+                                    food.categoryLevel1 = targetLevel1.name;
+                                    food.categoryLevel2 = '';
+                                }
+                            }
+                        } else {
+                            const targetSub = categories.level1.flatMap(c => c.subcategories).find(s => s.id === targetId);
+                            if (targetSub) {
+                                const targetLevel1 = categories.level1.find(c => c.subcategories.includes(targetSub));
+                                for (let food of foodsInCategory) {
+                                    food.categoryLevel1 = targetLevel1.name;
+                                    food.categoryLevel2 = targetSub.name;
+                                }
+                            }
+                        }
+                        await saveFoodsToAPI();
+                    } else if (option === 'delete') {
+                        foods = foods.filter(f => !foodsInCategory.includes(f));
+                        await saveFoodsToAPI();
+                    }
+                    if (currentDeleteType === 'level1') {
+                        categories.level1 = categories.level1.filter(c => c.id !== currentDeleteData.id);
+                    } else {
+                        const level1 = categories.level1.find(c => c.id === currentDeleteData.parentId);
+                        if (level1) level1.subcategories = level1.subcategories.filter(s => s.id !== currentDeleteData.id);
+                    }
+                    await saveCategoriesToAPI();
+                    closeDeleteModal();
+                    renderCategories();
+                    updateFilterDropdowns();
+                    renderFoods();
+                };
+            }
+            document.getElementById('deleteConfirmModal').classList.add('show');
+        }
+        
+        function closeDeleteModal() { document.getElementById('deleteConfirmModal').classList.remove('show'); currentDeleteData = null; }
+        
+        function updateFilterDropdowns() {
+            const filterLevel1 = document.getElementById('filterCategory1');
+            filterLevel1.innerHTML = '<option value="all">全部</option>';
+            categories.level1.sort((a,b) => a.order - b.order).forEach(c => {
+                filterLevel1.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>';
+            });
+            updateFilterCategory2Options();
+            updateCategoryDropdowns();
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'food') {
+                document.querySelector('.tab-btn').classList.add('active');
+                document.getElementById('foodTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('categoryTab').classList.add('active');
+                renderCategories();
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        async function checkLogin() {
+            const pwd = document.getElementById('passwordInput').value;
+            try {
+                const response = await fetch(API_BASE + '/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 保存 token
+                    const token = data.token;
+                    sessionStorage.setItem('admin_token', token);
+                    window.adminToken = token;
+                    
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    await Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]);
+                    updateFilterDropdowns();
+                    renderFoods();
+                    renderCategories();
+                    showToast('✅ 登录成功', 'success');
+                } else {
+                    document.getElementById('loginError').innerText = data.message || '密码错误';
+                }
+            } catch(e) {
+                console.error('登录失败:', e);
+                document.getElementById('loginError').innerText = '网络错误，请重试';
+            }
+        }
 
-function renderFoods() {
-    const filtered = getFilteredFoods();
-    const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const pageFoods = filtered.slice(start, start + PAGE_SIZE);
-    document.getElementById('statsBar').innerHTML = '共 ' + filtered.length + ' 条食品数据（总计 ' + foods.length + ' 条）';
-    const tbody = document.getElementById('foodTableBody');
-    if (pageFoods.length === 0) { tbody.innerHTML = '<tr><td colspan="7">暂无数据</td></tr>'; document.getElementById('pagination').innerHTML = ''; return; }
-    let html = '';
-    for (let f of pageFoods) {
-        const blockClass = f.block === 'green' ? 'badge-green' : (f.block === 'yellow' ? 'badge-yellow' : 'badge-red');
-        const blockText = f.block === 'green' ? '绿灯' : (f.block === 'yellow' ? '黄灯' : '红灯');
-        const proteinDisplay = f.protein ? f.protein + 'g' : '-';
-        const highProteinBadge = f.isHighProtein ? '<span class="badge badge-high-protein">🥩 高蛋白</span>' : '-';
-        html += '<tr>';
-        html += '<td><strong>' + (f.name || '') + '</strong><br><span style="font-size:12px;color:#999;">' + (f.alias || '无别名') + '</span></td>';
-        html += '<td>' + (f.categoryLevel1 || '') + (f.categoryLevel2 ? ' > ' + f.categoryLevel2 : '') + '</td>';
-        html += '<td>' + (f.gi || '-') + '</td>';
-        html += '<td><span class="badge ' + blockClass + '">' + blockText + '</span></td>';
-        html += '<td>' + proteinDisplay + '</td>';
-        html += '<td>' + highProteinBadge + '</td>';
-        html += '<td><button class="edit-btn" onclick="editFood(\'' + f.id + '\')">编辑</button> <button class="delete-btn" onclick="deleteFood(\'' + f.id + '\')">删除</button></td>';
-        html += '</tr>';
-    }
-    tbody.innerHTML = html;
-    renderPagination(totalPages);
-}
+        // 页面加载时自动恢复登录状态
+        function autoRestoreLogin() {
+            const token = sessionStorage.getItem('admin_token');
+            if (token) {
+                console.log('检测到已保存的登录状态，自动恢复');
+                // 恢复 token
+                window.adminToken = token;
+                // 显示后台界面
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                // 加载数据
+                Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]).then(() => {
+                    updateFilterDropdowns();
+                    renderFoods();
+                    renderCategories();
+                    showToast('✅ 欢迎回来', 'success');
+                }).catch(e => {
+                    console.error('自动恢复登录失败:', e);
+                    // 如果失败，清除 token 并显示登录页
+                    sessionStorage.removeItem('admin_token');
+                    document.getElementById('loginScreen').style.display = 'flex';
+                    document.getElementById('adminPanel').style.display = 'none';
+                });
+            }
+        }
 
-function renderPagination(totalPages) {
-    const div = document.getElementById('pagination');
-    if (totalPages <= 1) { div.innerHTML = ''; return; }
-    div.innerHTML = '<button class="page-btn ' + (currentPage === 1 ? 'disabled' : '') + '" onclick="changePage(' + (currentPage - 1) + ')">上一页</button><span>第 ' + currentPage + ' / ' + totalPages + ' 页</span><button class="page-btn ' + (currentPage === totalPages ? 'disabled' : '') + '" onclick="changePage(' + (currentPage + 1) + ')">下一页</button>';
-}
-
-function changePage(page) { currentPage = page; renderFoods(); }
-
-async function saveToAPI() {
-    await fetch(API_BASE + '/api/foods', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(foods) });
-    await fetch(API_BASE + '/api/categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(categories) });
-}
-
-function openAddModal() {
-    document.getElementById('foodForm').reset();
-    document.getElementById('foodId').value = '';
-    document.getElementById('modalTitle').innerText = '添加食品';
-    updateSubcategories();
-    document.getElementById('foodModal').classList.add('show');
-}
-
-function closeModal() { document.getElementById('foodModal').classList.remove('show'); }
-
-function updateSubcategories() {
-    const level1Id = document.getElementById('categoryLevel1').value;
-    const level2Select = document.getElementById('categoryLevel2');
-    if (!level1Id) { level2Select.innerHTML = '<option value="">请先选择一级分类</option>'; return; }
-    const level1 = categories.level1.find(c => c.id === level1Id);
-    let html = '<option value="">无</option>';
-    if (level1 && level1.subcategories) {
-        level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
-            html += '<option value="' + sub.id + '">' + sub.name + '</option>';
-        });
-    }
-    level2Select.innerHTML = html;
-}
-
-function editFood(id) {
-    const food = foods.find(f => f.id === id);
-    if (!food) return;
-    document.getElementById('foodId').value = food.id;
-    document.getElementById('name').value = food.name;
-    document.getElementById('alias').value = food.alias || '';
-    const level1 = categories.level1.find(c => c.name === food.categoryLevel1);
-    if (level1) {
-        document.getElementById('categoryLevel1').value = level1.id;
-        updateSubcategories();
-        const level2 = level1.subcategories.find(s => s.name === food.categoryLevel2);
-        if (level2) document.getElementById('categoryLevel2').value = level2.id;
-    }
-    document.getElementById('effect').value = food.effect || '';
-    document.getElementById('gi').value = food.gi || '';
-    document.getElementById('block').value = food.block;
-    document.getElementById('protein').value = food.protein || '';
-    document.getElementById('isHighProtein').checked = food.isHighProtein;
-    document.getElementById('modalTitle').innerText = '编辑食品';
-    document.getElementById('foodModal').classList.add('show');
-}
-
-async function deleteFood(id) {
-    if (!confirm('确定删除吗？')) return;
-    foods = foods.filter(f => f.id !== id);
-    await saveToAPI();
-    renderFoods();
-}
-
-async function saveFood(e) {
-    e.preventDefault();
-    const id = document.getElementById('foodId').value;
-    const level1Obj = categories.level1.find(c => c.id === document.getElementById('categoryLevel1').value);
-    const level2Id = document.getElementById('categoryLevel2').value;
-    const level2Obj = level1Obj ? level1Obj.subcategories.find(s => s.id === level2Id) : null;
-    const foodData = {
-        name: document.getElementById('name').value,
-        alias: document.getElementById('alias').value,
-        categoryLevel1: level1Obj ? level1Obj.name : '',
-        categoryLevel2: level2Obj ? level2Obj.name : '',
-        effect: document.getElementById('effect').value,
-        gi: parseInt(document.getElementById('gi').value) || null,
-        block: document.getElementById('block').value,
-        protein: parseFloat(document.getElementById('protein').value) || null,
-        isHighProtein: document.getElementById('isHighProtein').checked,
-        id: id || Date.now().toString()
-    };
-    if (id) {
-        const index = foods.findIndex(f => f.id === id);
-        if (index !== -1) foods[index] = foodData;
-    } else {
-        foods.push(foodData);
-    }
-    await saveToAPI();
-    closeModal();
-    renderFoods();
-}
-
-document.getElementById('categoryLevel1').addEventListener('change', updateSubcategories);
-document.getElementById('foodForm').addEventListener('submit', saveFood);
-document.getElementById('addBtn').addEventListener('click', openAddModal);
-document.getElementById('logoutBtn').addEventListener('click', logout);
-document.getElementById('filterCategory1').addEventListener('change', () => { updateFilterCategory2(); currentPage = 1; renderFoods(); });
-document.getElementById('filterCategory2').addEventListener('change', () => { currentPage = 1; renderFoods(); });
-document.getElementById('filterBlock').addEventListener('change', () => { currentPage = 1; renderFoods(); });
-document.getElementById('filterProtein').addEventListener('change', () => { currentPage = 1; renderFoods(); });
-document.getElementById('searchInput').addEventListener('input', (e) => { currentSearch = e.target.value.toLowerCase(); currentPage = 1; renderFoods(); });
-document.getElementById('foodModal').addEventListener('click', (e) => { if (e.target === document.getElementById('foodModal')) closeModal(); });
-
-if (!checkAuth()) {
-    document.body.innerHTML = '<div style="text-align:center;margin-top:200px"><h2>未授权</h2><p>密码错误或未登录</p></div>';
-} else {
-    loadData();
-}
-</script>
+        // 页面加载完成后执行
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', autoRestoreLogin);
+        } else {
+            autoRestoreLogin();
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('admin_token');
+            window.adminToken = null;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').innerText = '';
+            showToast('已退出登录', 'info');
+        }
+        
+        // 事件监听
+        document.getElementById('filterCategory1').addEventListener('change', function() { updateFilterCategory2Options(); currentPage = 1; renderFoods(); });
+        document.getElementById('filterCategory2').addEventListener('change', function() { currentPage = 1; renderFoods(); });
+        document.getElementById('filterBlock').addEventListener('change', function() { currentPage = 1; renderFoods(); });
+        document.getElementById('filterProtein').addEventListener('change', function() { currentPage = 1; renderFoods(); });
+        document.getElementById('searchInput').addEventListener('input', function() { currentPage = 1; renderFoods(); });
+        document.getElementById('categoryLevel1').addEventListener('change', updateSubcategories);
+        document.getElementById('foodForm').addEventListener('submit', saveFood);
+        document.getElementById('categoryForm').addEventListener('submit', saveCategory);
+    </script>
 </body>
 </html>

@@ -563,9 +563,12 @@
     <div id="adminPanel" style="display: none;">
         <div class="admin-container">
             <div class="admin-header">
-                <h1>🥗 饮食健康助手 · 数据管理</h1>
-                <button onclick="logout()" class="logout-btn">退出登录</button>
-            </div>
+              <h1>🥗 饮食健康助手 · 数据管理</h1>
+              <div>
+                  <button id="purgeCacheBtn" class="purge-btn" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin-right: 12px;">🔄 刷新前端缓存</button>
+                  <button onclick="logout()" class="logout-btn">退出登录</button>
+              </div>
+          </div>
             
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('food')">🍽️ 食品管理</button>
@@ -691,6 +694,38 @@
         let currentFilteredFoods = [];
         let currentDeleteData = null;
         let currentDeleteType = null;
+
+        // 刷新前端缓存
+        async function purgeFrontendCache() {
+            const btn = document.getElementById('purgeCacheBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ 清除中...';
+            btn.disabled = true;
+            
+            try {
+                const token = window.adminToken || sessionStorage.getItem('admin_token');
+                const response = await fetch(API_BASE + '/api/purge-cache', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic ' + token
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('✅ ' + data.message, 'success');
+                } else {
+                    showToast('❌ ' + data.message, 'error');
+                }
+            } catch(e) {
+                console.error('清除缓存失败:', e);
+                showToast('❌ 清除缓存失败，请重试', 'error');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
         
         async function loadFoodsFromAPI() {
             try {
@@ -1379,6 +1414,7 @@
         document.getElementById('categoryLevel1').addEventListener('change', updateSubcategories);
         document.getElementById('foodForm').addEventListener('submit', saveFood);
         document.getElementById('categoryForm').addEventListener('submit', saveCategory);
+        document.getElementById('purgeCacheBtn').addEventListener('click', purgeFrontendCache);
     </script>
 </body>
 </html>

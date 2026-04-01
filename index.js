@@ -1,7 +1,9 @@
 // ==================== 饮食健康助手 Worker API ====================
-// 包含登录验证、CORS 支持、数据存储
+// 包含登录验证、缓存清除功能
 
 const ADMIN_PASSWORD = "admin888";
+const CLOUDFLARE_ZONE_ID = "d6bb729e2b588ddff3e5624354c1a87d";
+const CLOUDFLARE_API_TOKEN = "cfut_QCMbaGqNnonSdOGtWSspA1W3xWEMUQdrinGsDTiK6413a88e";  // 需要您自己生成
 
 // 初始数据
 const INITIAL_FOODS = [
@@ -42,12 +44,33 @@ function verifyToken(request) {
     const token = auth.split(" ")[1];
     const decoded = atob(token);
     const parts = decoded.split(":");
-    // 格式: admin:password:timestamp
     const password = parts[1];
     return password === ADMIN_PASSWORD;
   } catch(e) {
     return false;
   }
+}
+
+// 清除 Cloudflare 缓存
+async function purgeCloudflareCache() {
+  const url = `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${CLOUDFLARE_API_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      // 清除前端页面和 API 缓存
+      files: [
+        "https://jiankang.aaqq.site/",
+        "https://jiankang.aaqq.site/index.html",
+        "https://jiankang.aaqq.site/admin.html",
+        "https://jiankang.aaqq.site/api/foods"
+      ]
+    })
+  });
+  return await response.json();
 }
 
 // 处理 CORS 预检
@@ -84,45 +107,59 @@ export default {
       try {
         const { password } = await request.json();
         if (password === ADMIN_PASSWORD) {
-          // 生成 token（base64 编码）
           const token = btoa(`admin:${ADMIN_PASSWORD}:${Date.now()}`);
-          return new Response(JSON.stringify({ 
-            success: true, 
-            token: token 
-          }), { headers: corsHeaders });
+          return new Response(JSON.stringify({ success: true, token: token }), { headers: corsHeaders });
         } else {
-          return new Response(JSON.stringify({ 
-            success: false, 
-            message: "密码错误" 
-          }), { 
-            status: 401,
-            headers: corsHeaders 
+          return new Response(JSON.stringify({ success: false, message: "密码错误" }), { 
+            status: 401, headers: corsHeaders 
           });
         }
       } catch(e) {
-        return new Response(JSON.stringify({ 
-          success: false, 
-          message: "请求格式错误" 
-        }), { 
-          status: 400,
-          headers: corsHeaders 
+        return new Response(JSON.stringify({ success: false, message: "请求格式错误" }), { 
+          status: 400, headers: corsHeaders 
         });
       }
     }
 
+    // ==================== 刷新前端缓存 API ====================
+    if (path === "/api/purge-cache" && request.method === "POST") {
+      if (!verifyToken(request)) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: corsHeaders
+        });
+      }
+      
+      try {
+        const result = await purgeCloudflareCache();
+        if (result.success) {
+          return new Response(JSON.stringify({ 
+            success: true, 
+            message: "缓存已清除，公开展示页将显示最新数据" 
+          }), { headers: corsHeaders });
+        } else {
+          return new Response(JSON.stringify({ 
+            success: false, 
+            message: "清除失败: " + JSON.stringify(result.errors) 
+          }), { status: 500, headers: corsHeaders });
+        }
+      } catch(e) {
+        return new Response(JSON.stringify({ 
+          success: false, 
+          message: "清除失败: " + e.message 
+        }), { status: 500, headers: corsHeaders });
+      }
+    }
+
     // ==================== 食品 API ====================
-    // GET /api/foods - 获取食品列表（无需认证）
     if (path === "/api/foods" && request.method === "GET") {
       const foods = await env.DIET_DATA.get("foods", "json") || [];
       return new Response(JSON.stringify(foods), { headers: corsHeaders });
     }
 
-    // POST /api/foods - 保存食品列表（需要认证）
     if (path === "/api/foods" && request.method === "POST") {
       if (!verifyToken(request)) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: corsHeaders
+          status: 401, headers: corsHeaders
         });
       }
       const foods = await request.json();
@@ -131,18 +168,15 @@ export default {
     }
 
     // ==================== 分类 API ====================
-    // GET /api/categories - 获取分类列表（无需认证）
     if (path === "/api/categories" && request.method === "GET") {
       const categories = await env.DIET_DATA.get("categories", "json") || { level1: [] };
       return new Response(JSON.stringify(categories), { headers: corsHeaders });
     }
 
-    // POST /api/categories - 保存分类列表（需要认证）
     if (path === "/api/categories" && request.method === "POST") {
       if (!verifyToken(request)) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: corsHeaders
+          status: 401, headers: corsHeaders
         });
       }
       const categories = await request.json();
@@ -151,8 +185,7 @@ export default {
     }
 
     return new Response(JSON.stringify({ error: "Not Found" }), { 
-      status: 404,
-      headers: corsHeaders 
+      status: 404, headers: corsHeaders 
     });
   }
 };

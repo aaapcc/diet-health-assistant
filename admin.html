@@ -65,6 +65,35 @@
             font-weight: 600;
             cursor: pointer;
         }
+        /* 按钮 loading 状态 */
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-btn.loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .login-btn.loading::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            top: 50%;
+            left: 50%;
+            margin-left: -9px;
+            margin-top: -9px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
         
         .error-msg {
             color: #ef4444;
@@ -101,7 +130,7 @@
             background: #ef4444;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 14px;
             border-radius: 40px;
             cursor: pointer;
             font-size: 14px;
@@ -109,17 +138,17 @@
         
         .tabs {
             display: flex;
-            gap: 8px;
+            gap: 2px;
             margin-bottom: 24px;
             background: white;
-            padding: 8px 16px;
+            padding: 8px 10px;
             border-radius: 60px;
             display: inline-flex;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .tab-btn {
-            padding: 10px 24px;
+            padding: 10px 15px;
             border: none;
             background: transparent;
             font-size: 15px;
@@ -302,7 +331,7 @@
         
         .modal-content {
             background: white;
-            padding: 28px;
+            padding: 20px;
             border-radius: 24px;
             width: 90%;
             max-width: 550px;
@@ -315,7 +344,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .modal-header h3 {
@@ -329,12 +358,12 @@
         }
         
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
             font-size: 14px;
             color: #374151;
@@ -342,9 +371,9 @@
         
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
+            border-radius: 5px;
             font-size: 14px;
             font-family: inherit;
             outline: none;
@@ -555,7 +584,7 @@
         <div class="login-box">
             <h2>🔐 管理后台登录</h2>
             <input type="password" id="passwordInput" class="login-input" placeholder="请输入管理密码">
-            <button onclick="checkLogin()" class="login-btn">登录</button>
+            <button id="loginBtn" class="login-btn">登录</button>
             <div id="loginError" class="error-msg"></div>
         </div>
     </div>
@@ -565,15 +594,21 @@
             <div class="admin-header">
               <h1>🥗 饮食健康助手 · 数据管理</h1>
               <div>
-                  <button id="purgeCacheBtn" class="purge-btn" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; margin-right: 12px;">🔄 刷新前端缓存</button>
+                  <button id="purgeCacheBtn" class="purge-btn" style="background: #f59e0b; color: white; border: none; padding: 10px 14px; border-radius: 40px; cursor: pointer; margin-right: 5px;">🔄 刷新前端缓存</button>
                   <button onclick="logout()" class="logout-btn">退出登录</button>
               </div>
           </div>
             
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('food')">🍽️ 食品管理</button>
-                <button class="tab-btn" onclick="switchTab('category')">📂 分类管理</button>
-            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="tabs">
+                  <button class="tab-btn active" onclick="switchTab('food')">🍽️ 食品管理</button>
+                  <button class="tab-btn" onclick="switchTab('category')">📂 分类管理</button>
+              </div>
+              <div id="tabButtonArea" style="display: flex; gap: 12px;">
+                  <button id="foodTabBtn" onclick="openFoodModal()" class="add-btn" style="display: inline-block;">+ 添加食品</button>
+                  <button id="categoryTabBtn" onclick="openCategoryModal('level1')" class="add-btn" style="display: none;">+ 添加一级分类</button>
+              </div>
+          </div>
             
             <div id="foodTab" class="tab-content active">
                 <div class="filters-bar">
@@ -584,10 +619,6 @@
                         <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select></div>
                         <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">🥩 高蛋白</option><option value="low">❌ 非高蛋白</option></select></div>
                     </div>
-                </div>
-                
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <button onclick="openFoodModal()" class="add-btn">+ 添加食品</button>
                 </div>
                 
                 <div class="stats-bar" id="statsBar">加载中...</div>
@@ -603,9 +634,6 @@
             </div>
             
             <div id="categoryTab" class="tab-content">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <button onclick="openCategoryModal('level1')" class="add-btn">+ 添加一级分类</button>
-                </div>
                 <div class="category-table-wrapper" id="categoryList"></div>
             </div>
         </div>
@@ -618,7 +646,7 @@
             <form id="foodForm">
                 <input type="hidden" id="foodId">
                 <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
-                <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用空格分隔"></div>
+                <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用英文逗号分隔，如：土豆,马铃薯,洋芋"></div>
                 <div class="form-row">
                     <div class="form-group"><label>一级分类 *</label><select id="categoryLevel1" required onchange="updateSubcategories()"><option value="">请选择</option></select></div>
                     <div class="form-group"><label>二级分类</label><select id="categoryLevel2"><option value="">请先选择一级分类</option></select></div>
@@ -741,24 +769,8 @@
             } catch(e) { console.error('加载分类失败:', e); categories = { level1: [] }; }
         }
         
-        async function saveFoodsToAPI() {
-            const token = window.adminToken || sessionStorage.getItem('admin_token');
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            if (token) {
-                headers['Authorization'] = 'Basic ' + token;
-            }
-            
-            await fetch(API_BASE + '/api/foods', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(foods)
-            });
-        }
-        
         async function saveCategoriesToAPI() {
-            const token = window.adminToken || sessionStorage.getItem('admin_token');
+            const token = window.adminToken || localStorage.getItem('admin_token');
             const headers = {
                 'Content-Type': 'application/json'
             };
@@ -777,6 +789,22 @@
                 logout();
             }
             return response;
+        }
+
+        async function saveFoodsToAPI() {
+            const token = window.adminToken || localStorage.getItem('admin_token');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = 'Basic ' + token;
+            }
+            
+            await fetch(API_BASE + '/api/foods', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(foods)
+            });
         }
         
         function getFilteredFoods() {
@@ -1080,7 +1108,7 @@
             const level2Obj = level1Obj ? level1Obj.subcategories.find(s => s.id === level2Id) : null;
             const foodData = {
                 name: document.getElementById('name').value,
-                alias: document.getElementById('alias').value,
+                alias: document.getElementById('alias').value.split(',').map(s => s.trim()).filter(s => s),
                 categoryLevel1: level1Obj ? level1Obj.name : '',
                 categoryLevel2: level2Obj ? level2Obj.name : '',
                 effect: document.getElementById('effect').value,
@@ -1310,12 +1338,20 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            const foodBtn = document.getElementById('foodTabBtn');
+            const categoryBtn = document.getElementById('categoryTabBtn');
+            
             if (tab === 'food') {
                 document.querySelector('.tab-btn').classList.add('active');
                 document.getElementById('foodTab').classList.add('active');
+                foodBtn.style.display = 'inline-block';
+                categoryBtn.style.display = 'none';
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('categoryTab').classList.add('active');
+                foodBtn.style.display = 'none';
+                categoryBtn.style.display = 'inline-block';
                 renderCategories();
             }
         }
@@ -1331,7 +1367,14 @@
         }
         
         async function checkLogin() {
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.textContent;
+            
+            btn.textContent = '⏳ 登录中...';
+            btn.disabled = true;
+            
             const pwd = document.getElementById('passwordInput').value;
+            
             try {
                 const response = await fetch(API_BASE + '/api/login', {
                     method: 'POST',
@@ -1341,50 +1384,61 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // 保存 token
                     const token = data.token;
-                    sessionStorage.setItem('admin_token', token);
+                    localStorage.setItem('admin_token', token);
                     window.adminToken = token;
                     
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('adminPanel').style.display = 'block';
-                    await Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]);
-                    updateFilterDropdowns();
-                    renderFoods();
-                    renderCategories();
-                    showToast('✅ 登录成功', 'success');
+                    
+                    // 异步加载数据
+                    Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]).then(() => {
+                        updateFilterDropdowns();
+                        renderFoods();
+                        renderCategories();
+                        showToast('✅ 登录成功', 'success');
+                    });
                 } else {
                     document.getElementById('loginError').innerText = data.message || '密码错误';
+                    btn.textContent = originalText;
+                    btn.disabled = false;
                 }
             } catch(e) {
                 console.error('登录失败:', e);
                 document.getElementById('loginError').innerText = '网络错误，请重试';
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
         }
 
         // 页面加载时自动恢复登录状态
-        function autoRestoreLogin() {
-            const token = sessionStorage.getItem('admin_token');
-            if (token) {
-                console.log('检测到已保存的登录状态，自动恢复');
-                // 恢复 token
-                window.adminToken = token;
-                // 显示后台界面
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                // 加载数据
-                Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]).then(() => {
-                    updateFilterDropdowns();
-                    renderFoods();
-                    renderCategories();
-                    showToast('✅ 欢迎回来', 'success');
-                }).catch(e => {
-                    console.error('自动恢复登录失败:', e);
-                    // 如果失败，清除 token 并显示登录页
-                    sessionStorage.removeItem('admin_token');
-                    document.getElementById('loginScreen').style.display = 'flex';
-                    document.getElementById('adminPanel').style.display = 'none';
-                });
+        async function autoRestoreLogin() {
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('adminPanel').style.display = 'none';
+                return;
+            }
+            
+            // 直接信任本地 token，不发送验证请求
+            window.adminToken = token;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            
+            // 加载数据，如果失败则可能是 token 过期
+            try {
+                await Promise.all([loadFoodsFromAPI(), loadCategoriesFromAPI()]);
+                updateFilterDropdowns();
+                renderFoods();
+                renderCategories();
+                showToast('✅ 欢迎回来', 'success');
+            } catch(e) {
+                console.error('加载数据失败，token 可能已过期:', e);
+                // 清除 token 并显示登录页
+                localStorage.removeItem('admin_token');
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('adminPanel').style.display = 'none';
+                showToast('⚠️ 登录已过期，请重新登录', 'error');
             }
         }
 
@@ -1394,9 +1448,17 @@
         } else {
             autoRestoreLogin();
         }
+
+        // ========== 页面加载完成后绑定事件 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', checkLogin);
+            }
+        });
         
         function logout() {
-            sessionStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_token');
             window.adminToken = null;
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('adminPanel').style.display = 'none';

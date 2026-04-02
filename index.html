@@ -2,95 +2,34 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>饮食健康助手 - 食品查询</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #f5f7fa;
-            color: #1f2937;
-            padding-bottom: 30px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 24px 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 16px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid #e5e7eb;
-            border-radius: 40px;
-            font-size: 16px;
-            outline: none;
-            background: white;
-            margin-bottom: 20px;
-        }
-        
-        .search-input:focus {
-            border-color: #10b981;
-        }
-        
-        .filter-section {
-            margin-bottom: 20px;
-        }
-        
-        .filter-title {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .filter-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            background: white;
-            border: 2px solid #e5e7eb;
-        }
-        
-        .filter-btn.active {
-            border-width: 2px;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #f5f7fa; color: #1f2937; padding-bottom: 30px; }
+        /* 欢迎弹窗 */
+        .welcome-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10001; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .welcome-modal.hide { display: none; }
+        .welcome-content { background: white; border-radius: 10px; max-width: 400px; width: 100%; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .welcome-content h3 { font-size: 20px; margin-bottom: 16px; color: #10b981; }
+        .welcome-content p { font-size: 15px; color: #222; line-height: 1.4; margin-bottom: 2px; }
+        .welcome-content .tip-list { margin: 5px 0 15px; padding-left: 20px; }
+        .welcome-content .tip-list li { font-size: 14px; color: #666; margin-bottom: 5px; line-height: 1.3; }
+        .welcome-content .tip-list li strong{ margin: 0px 3px; text-decoration: underline; font-style: italic; }
+        .welcome-content .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 20px 0; }
+        .welcome-content .checkbox-row input { width: 18px; height: 18px; }
+        .welcome-content .close-btn { width: 100%; padding: 12px; background: #10b981; color: white; border: none; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        /* 主内容 */
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 22px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 25px; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px 12px; }
+        .search-input { width: 100%; padding: 12px 15px; border: 1px solid #cfd2d7; border-radius: 40px; font-size: 14px; outline: none; background: white; margin-bottom: 20px; }
+        .search-input:focus { border-color: #10b981; }
+        .filter-section { margin-bottom: 15px; }
+        .filter-title { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
+        .filter-group { display: flex; gap: 5px; flex-wrap: wrap; }
+        .filter-btn { padding: 2px 10px; border: none; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; background: white; border: 1px solid #e5e7eb; }
         .filter-btn.green { color: #10b981; border-color: #10b981; }
         .filter-btn.green.active { background: #10b981; color: white; }
         .filter-btn.yellow { color: #f59e0b; border-color: #f59e0b; }
@@ -101,362 +40,110 @@
         .filter-btn.high-protein.active { background: #3b82f6; color: white; }
         .filter-btn.low-protein { color: #6b7280; border-color: #6b7280; }
         .filter-btn.low-protein.active { background: #6b7280; color: white; }
-        
-        .category-section {
-            margin-bottom: 20px;
-        }
-        
-        .category-nav {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .category-item {
-            padding: 8px 20px;
-            background: white;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid #e5e7eb;
-            color: #4b5563;
-        }
-        
-        .category-item.active {
-            background: #10b981;
-            color: white;
-            border-color: #10b981;
-        }
-        
-        .subcategory-section {
-            margin-bottom: 20px;
-            padding-left: 8px;
-            border-left: 3px solid #10b981;
-        }
-        
-        .subcategory-nav {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .subcategory-item {
-            padding: 6px 16px;
-            background: #f3f4f6;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            color: #4b5563;
-        }
-        
-        .subcategory-item.active {
-            background: #10b981;
-            color: white;
-        }
-        
-        .stats {
-            margin-bottom: 16px;
-            font-size: 14px;
-            color: #6b7280;
-            padding: 8px 0;
-        }
-        
+        .filter-btn.black { color: #3d5074; border-color: #3d5074; }
+        .filter-btn.black.active { background: #3d5074; color: white; }
+        .category-section { margin-bottom: 15px; }
+        .category-nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        .category-item { padding: 3px 8px; background: white; border-radius: 40px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #ced0d5; color: #4b5563; }
+        .category-item.active { background: #10b981; color: white; border-color: #10b981; }
+        .subcategory-section { margin-bottom: 15px; /*padding-left: 8px; border-left: 3px solid #10b981;*/ }
+        .subcategory-nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        .subcategory-item { padding: 3px 8px; background: #fff; border-radius: 40px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #ced0d5; color: #4b5563; }
+        .subcategory-item.active { background: #10b981; color: white; border: 1px solid #10b981; }
+        .stats { margin-bottom: 5px; font-size: 14px; color: #6b7280; padding: 8px 0; }
         /* 食品卡片网格 - 图片在上方布局 */
-        .food-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-        
-        @media (min-width: 640px) {
-            .food-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .food-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .food-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        .food-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .food-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        }
-        
+        .food-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (min-width: 640px) { .food-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 768px) { .food-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .food-grid { grid-template-columns: repeat(4, 1fr); } }
+        .food-card { background: white; border-radius: 6px; border: 1px solid rgba(0,0,0,0.12); overflow: hidden; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; }
+        .food-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
         /* 图片区域 */
-        .food-image {
-            width: 100%;
-            height: 120px;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        
-        .food-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .food-image-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #f3f4f6;
-            color: #9ca3af;
-            font-size: 32px;
-        }
-        
-        .food-image-placeholder span:first-child {
-            font-size: 48px;
-        }
-        
-        .food-image-placeholder span:last-child {
-            font-size: 12px;
-            margin-top: 4px;
-        }
-        
+        .food-image { width: 100%; height: 100px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px; }
+        .food-image img { width: auto; height: 100%; object-fit: contain; border-radius: 6px; }
+        .food-image-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6; color: #9ca3af; font-size: 32px; }
+        .food-image-placeholder span:first-child { font-size: 46px; }
+        .food-image-placeholder span:last-child { font-size: 12px; }
         /* 卡片内容区域 */
-        .card-content {
-            padding: 12px;
-            border-left: 4px solid;
-        }
-        
+        .card-content { padding: 8px 12px 12px; border-left: 4px solid; flex: 1; display: flex; flex-direction: column; }
         .card-content.green { border-left-color: #10b981; }
         .card-content.yellow { border-left-color: #f59e0b; }
         .card-content.red { border-left-color: #ef4444; }
-        
-        .food-name {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        
-        .food-alias {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-bottom: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .food-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 500;
-            background: #f3f4f6;
-        }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        
+        .card-content.black { border-left-color: #6b7280; }
+        .food-name { font-size: 16px; font-weight: 700; }
+        .food-alias { font-size: 11px; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .food-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+        .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 500; background: #ececec; }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
         .badge.green { background: #d1fae5; color: #065f46; }
-        .badge.yellow { background: #fed7aa; color: #92400e; }
+        .badge.yellow { background: #ffe8cd; color: #92400e; }
         .badge.red { background: #fee2e2; color: #991b1b; }
         .badge.high-protein { background: #dbeafe; color: #1e40af; }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #9ca3af;
-            grid-column: 1 / -1;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 24px;
-            padding: 16px 0;
-        }
-        
-        .page-btn {
-            padding: 8px 20px;
-            border: 1px solid #e5e7eb;
-            background: white;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .page-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .page-info {
-            padding: 8px 16px;
-            color: #6b7280;
-        }
-        
+        .badge.black { background: #3d5074; color: white; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #9ca3af; grid-column: 1 / -1; }
+        .pagination { display: flex; justify-content: center; gap: 12px; margin-top: 24px; padding: 12px 0; }
+        .page-btn { padding: 8px 20px; border: 1px solid #e5e7eb; background: white; border-radius: 40px; cursor: pointer; font-size: 14px; }
+        .page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-info { padding: 8px 16px; color: #6b7280; font-size: 13px; }
         /* 详情弹窗 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .modal-header h3 {
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .close-btn {
-            font-size: 28px;
-            cursor: pointer;
-            color: #9ca3af;
-        }
-        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 10px; max-width: 500px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 16px 18px 8px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 15px; border-bottom: 1px solid #eaeaea; }
+        .modal-header h3 { font-size: 22px; font-weight: 700; }
+        .close-btn { font-size: 28px; cursor: pointer; color: #9ca3af; }
         /* 详情弹窗图片 */
-        .detail-image {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .detail-image img {
-            width: 200px;
-            height: 200px;
-            object-fit: contain;
-            border-radius: 16px;
-            background: #f3f4f6;
-        }
-        
-        .detail-image-placeholder {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #f3f4f6;
-            border-radius: 16px;
-            color: #9ca3af;
-        }
-        
-        .detail-image-placeholder span:first-child {
-            font-size: 64px;
-        }
-        
-        .detail-image-placeholder span:last-child {
-            font-size: 14px;
-            margin-top: 8px;
-        }
-        
-        .detail-row {
-            margin-bottom: 20px;
-        }
-        
-        .detail-label {
-            font-weight: 600;
-            color: #6b7280;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-        
-        .detail-value {
-            font-size: 15px;
-            color: #1f2937;
-            line-height: 1.5;
-        }
-        
-        .gi-value {
-            font-size: 32px;
-            font-weight: 700;
-            display: inline-block;
-        }
-        
-        .gi-level {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-left: 12px;
-        }
-        
-        .gi-level.low { background: #d1fae5; color: #065f46; }
-        .gi-level.medium { background: #fed7aa; color: #92400e; }
-        .gi-level.high { background: #fee2e2; color: #991b1b; }
+        .detail-image { text-align: center; margin-bottom: 6px; }
+        .detail-image img { width: 115px; height: 115px; object-fit: contain; border-radius: 10px; background: #f3f4f6; }
+        .detail-image-placeholder { width: 115px; height: 115px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 10px; color: #9ca3af; }
+        .detail-image-placeholder span:first-child { font-size: 54px; }
+        .detail-image-placeholder span:last-child { font-size: 14px; }
+        .detail-row { margin-bottom: 14px; }
+        .detail-row .tips{ font-size: 12px; margin-top: 6px; padding: 5px 7px; background: #fff4f4; border: 1px solid; border-radius: 4px; }
+        .detail-row .tips.green{ color: #004532; background: #d1fae5; border-color: #b8e9d1; }
+        .detail-row .tips.yellow{ color: #6e2a00; background: #ffefdd; border-color: #f0dac4; }
+        .detail-row .tips.red{ color: #750d0d; background: #ffeaea; border-color: #efcaca; }
+        .detail-row .tips.black{ color: #fff; background: #3d5074; border-color: #3d5174; }
+        .detail-row .tips.gi{ color: #333; background: #f2f2f2; border-color: #d8d8d8; }
+        .detail-label { font-weight: 600; color: #6b7280; font-size: 13px; margin-bottom: 5px; }
+        .detail-value { font-size: 15px; color: #1f2937; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .detail-value-food-alias{ text-align: center; color: #9ca3af; font-size: 14px; font-style: italic; }
+        .gi-value { font-size: 32px; font-weight: 700; display: inline-block; }
+        .gi-level { display: inline-block; padding: 0px 8px; border-radius: 30px; font-size: 12px; font-weight: 600; height: 22px; line-height: 22px; vertical-align: middle; }
+        .gi-level.low { background: #d1fae5; color: #065f46; }.gi-level.medium { background: #ffe8cd; color: #92400e; }.gi-level.high { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
+    <!-- 欢迎弹窗 -->
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="welcome-content">
+            <h3>饮食健康小贴士</h3>
+            <p><strong>🚫 不能吃</strong></p>
+            <ul class="tip-list">
+                <li>按照医嘱<strong>海带汤</strong>、<strong>🎃南瓜</strong>绝对不能吃；</li>
+            </ul>
+            <p><strong>🔴 红灯食品（少吃或不吃，尽量避免），但绝不能单独吃。</strong></p>
+            <ul class="tip-list">
+                <li>比如<strong>馒头</strong>必须搭配<strong>🥚鸡蛋</strong>或<strong>🥛牛奶</strong>；</li>
+                <li>吃<strong>🍚米饭</strong>，必须先吃足量的<strong>蔬菜</strong>和<strong>蛋白质（鱼/肉/豆腐）</strong>等，降低整体的升糖速度。</li>
+            </ul>
+            <p><strong>🟡 黄灯食品（适量吃，注意分量）。</strong></p>
+            <ul class="tip-list">
+                <li>可少量作为配菜或调味蔬菜使用，不宜大量单独食用。</li>
+            </ul>
+            <p><strong>🟢 绿灯食品（推荐选择），“能吃”不等于“可多吃”，吃多了血糖照样会高。</strong></p>
+            <ul class="tip-list">
+                <li>主食总量要控制，每餐大约一个拳头大小。</li>
+            </ul>
+            <div class="checkbox-row">
+                <input type="checkbox" id="dontShowToday"> <label for="dontShowToday">今天不再显示</label>
+            </div>
+            <button class="close-btn" onclick="closeWelcomeModal()">我知道了</button>
+        </div>
+    </div>
+
     <div class="header">
-        <h1><span>🍎</span> 饮食健康助手</h1>
+        <h1><span>🍚</span> 饮食健康助手</h1>
         <p>管住嘴 · 迈开腿 · 科学饮食 · 健康控糖</p>
     </div>
     
@@ -464,29 +151,30 @@
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索菜名或别名...">
         
         <div class="filter-section">
-            <div class="filter-title">📊 食品分类</div>
+            <div class="filter-title">🚥 食品区块</div>
             <div class="filter-group">
-                <button class="filter-btn green" data-filter="green">🟢 绿灯食品</button>
-                <button class="filter-btn yellow" data-filter="yellow">🟡 黄灯食品</button>
-                <button class="filter-btn red" data-filter="red">🔴 红灯食品</button>
+                <button class="filter-btn green" data-filter="green">🟢 绿灯</button>
+                <button class="filter-btn yellow" data-filter="yellow">🟡 黄灯</button>
+                <button class="filter-btn red" data-filter="red">🔴 红灯</button>
+                <button class="filter-btn black" data-filter="black">🚫 不能吃</button>
             </div>
         </div>
         
         <div class="filter-section">
-            <div class="filter-title">💪 蛋白质</div>
+            <div class="filter-title">🥚 高蛋白</div>
             <div class="filter-group">
-                <button class="filter-btn high-protein" data-protein="high">🥩 高蛋白</button>
-                <button class="filter-btn low-protein" data-protein="low">❌ 非高蛋白</button>
+                <button class="filter-btn high-protein" data-protein="high">✅ 是</button>
+                <button class="filter-btn low-protein" data-protein="low">❌ 否</button>
             </div>
         </div>
         
         <div class="category-section">
-            <div class="filter-title">📂 食品大类</div>
+            <div class="filter-title">🥬 食品大类</div>
             <div class="category-nav" id="categoryNav"></div>
         </div>
         
         <div id="subcategorySection" class="subcategory-section" style="display: none;">
-            <div class="filter-title">🔍 细分类</div>
+            <div class="filter-title">🥗 细分类</div>
             <div id="subcategoryNav" class="subcategory-nav"></div>
         </div>
         
@@ -508,6 +196,37 @@
     </div>
     
     <script>
+        // 欢迎弹窗逻辑
+        function showWelcomeModal() {
+            // 检查 localStorage 是否有今天的标记
+            const lastShown = localStorage.getItem('welcome_last_shown');
+            const today = new Date().toDateString();
+            
+            if (lastShown === today) {
+                return; // 今天已显示过，不再显示
+            }
+            
+            const modal = document.getElementById('welcomeModal');
+            modal.classList.remove('hide');
+        }
+
+        function closeWelcomeModal() {
+            const dontShowToday = document.getElementById('dontShowToday').checked;
+            const modal = document.getElementById('welcomeModal');
+            modal.classList.add('hide');
+            
+            if (dontShowToday) {
+                const today = new Date().toDateString();
+                localStorage.setItem('welcome_last_shown', today);
+            }
+        }
+
+        // 在 loadData 之后调用弹窗
+        // 在 loadData() 函数末尾或 init 中添加
+        setTimeout(() => {
+            showWelcomeModal();
+        }, 500);
+
         // 配置API地址
         const API_BASE = 'https://diet-health-assistant-api.aaqq.site';
         
@@ -530,11 +249,19 @@
         }
         
         function getBlockIcon(block) {
-            return block === 'green' ? '🟢' : (block === 'yellow' ? '🟡' : '🔴');
+            if (block === 'green') return '🟢';
+            if (block === 'yellow') return '🟡';
+            if (block === 'red') return '🔴';
+            if (block === 'black') return '🚫';
+            return '';
         }
         
         function getBlockText(block) {
-            return block === 'green' ? '绿灯食品' : (block === 'yellow' ? '黄灯食品' : '红灯食品');
+            if (block === 'green') return '绿灯';
+            if (block === 'yellow') return '黄灯';
+            if (block === 'red') return '红灯';
+            if (block === 'black') return '不能吃';
+            return '';
         }
         
         // 获取图片HTML
@@ -575,17 +302,24 @@
             }
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             if (searchTerm) {
-                filtered = filtered.filter(food => 
-                    food.name.toLowerCase().includes(searchTerm) ||
-                    (food.alias && food.alias.toLowerCase().includes(searchTerm))
-                );
+                filtered = filtered.filter(food => {
+                    let aliasMatch = false;
+                    if (food.alias) {
+                        if (Array.isArray(food.alias)) {
+                            aliasMatch = food.alias.join('、').toLowerCase().includes(searchTerm);
+                        } else {
+                            aliasMatch = food.alias.toLowerCase().includes(searchTerm);
+                        }
+                    }
+                    return food.name.toLowerCase().includes(searchTerm) || aliasMatch;
+                });
             }
             return filtered;
         }
         
         function renderCategories() {
             const nav = document.getElementById('categoryNav');
-            let html = '<div class="category-item ' + (currentCategory === 'all' ? 'active' : '') + '" data-category="all">📋 全部</div>';
+            let html = '<div class="category-item ' + (currentCategory === 'all' ? 'active' : '') + '" data-category="all">全部</div>';
             (categories.level1 || []).sort((a,b) => a.order - b.order).forEach(c => {
                 html += '<div class="category-item ' + (currentCategory === c.id ? 'active' : '') + '" data-category="' + c.id + '">' + escapeHtml(c.name) + '</div>';
             });
@@ -637,7 +371,7 @@
             if (currentPage < 1) currentPage = 1;
             const start = (currentPage - 1) * PAGE_SIZE;
             const pageFoods = filtered.slice(start, start + PAGE_SIZE);
-            document.getElementById('stats').innerHTML = '找到 ' + filtered.length + ' 种食品';
+            document.getElementById('stats').innerHTML = '🔍 找到 ' + filtered.length + ' 种食品';
             const grid = document.getElementById('foodGrid');
             if (pageFoods.length === 0) {
                 grid.innerHTML = '<div class="empty-state">😊 没有找到相关食品</div>';
@@ -649,18 +383,20 @@
                 const blockClass = f.block;
                 const blockIcon = getBlockIcon(f.block);
                 const blockText = getBlockText(f.block);
-                const giDisplay = f.gi && f.gi > 0 ? 'GI: ' + f.gi : 'GI: 无';
-                const highProteinTag = f.isHighProtein ? '<span class="badge high-protein">🥩 高蛋白</span>' : '';
+                const giDisplay = f.gi && f.gi > 0 ? 'GI:' + f.gi : 'GI: 无';
+                const highProteinTag = f.isHighProtein ? '<span class="badge high-protein">🥚 高蛋白</span>' : '';
                 const imageHtml = getImageHtml(f.image, f.name);
                 
                 html += '<div class="food-card" data-id="' + f.id + '">';
                 html += '<div class="food-image">' + imageHtml + '</div>';
                 html += '<div class="card-content ' + blockClass + '">';
                 html += '<div class="food-name">' + escapeHtml(f.name) + '</div>';
-                html += '<div class="food-alias">' + (f.alias ? escapeHtml(f.alias) : '暂无别名') + '</div>';
+                if (f.alias && f.alias.length > 0) {
+                    html += '<div class="food-alias">' + escapeHtml(f.alias) + '</div>';
+                }
                 html += '<div class="food-tags">';
                 html += '<span class="tag">🍚 ' + giDisplay + '</span>';
-                html += '<span class="badge ' + blockClass + '">' + blockIcon + ' ' + blockText + '</span>';
+                // html += '<span class="badge ' + blockClass + '">' + blockIcon + ' ' + blockText + '</span>';
                 html += highProteinTag;
                 html += '</div></div></div>';
             }
@@ -693,51 +429,59 @@
                 else { giLevelText = '高GI'; giLevelClass = 'high'; }
             }
             const fullCategory = food.categoryLevel1 + (food.categoryLevel2 ? ' > ' + food.categoryLevel2 : '');
-            const highProteinTag = food.isHighProtein ? '<span class="badge high-protein" style="margin-left:8px">🥩 高蛋白</span>' : '';
+            const highProteinTag = food.isHighProtein ? '<span class="badge high-protein">🥚 高蛋白</span>' : '';
             const imageHtml = getDetailImageHtml(food.image, food.name);
             
-            document.getElementById('modalTitle').innerHTML = escapeHtml(food.name) + highProteinTag;
+            document.getElementById('modalTitle').innerHTML = escapeHtml(food.name);
+
+            // 在 showDetail 函数中，定义 blockHint
+            let blockHint = '';
+            if (food.block === 'green') {
+                blockHint = '<div class="tips green">🟢 绿灯食品（推荐选择），“能吃”不等于“可多吃”，吃多了血糖照样会高。</div>';
+            } else if (food.block === 'yellow') {
+                blockHint = '<div class="tips yellow">🟡 黄灯食品（适量吃，注意分量）。</div>';
+            } else if (food.block === 'red') {
+                blockHint = '<div class="tips red">🔴 红灯食品（少吃或不吃，尽量避免）。不是完全不能吃，但绝不能单独吃。</div>';
+            } else if (food.block === 'black') {
+                blockHint = '<div class="tips black">🚫 不能吃（禁止，绝对不能吃）。</div>';
+            }
+
             document.getElementById('modalBody').innerHTML = `
                 <div class="detail-image">${imageHtml}</div>
-                <div class="detail-row">
-                    <div class="detail-label">📝 别名</div>
-                    <div class="detail-value">${escapeHtml(food.alias || '无')}</div>
+                <div class="detail-row2">
+                    <div class="detail-value-food-alias">${escapeHtml(food.alias)}</div>
                 </div>
-                <div class="detail-row">
-                    <div class="detail-label">📂 分类</div>
-                    <div class="detail-value">${escapeHtml(fullCategory)}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">✨ 作用/功效</div>
+                <div class="detail-row" style="margin-top: 10px;">
+                    <div class="detail-label">☟ 作用/功效</div>
                     <div class="detail-value">${escapeHtml(food.effect || '暂无信息')}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">🍚 升糖指数 (GI)</div>
+                    <div class="detail-label"><span style="margin-right:3px;">☟ 食品属性</span>
+                        ${highProteinTag}
+                    </div>
+                    ${blockHint}
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">☟ 升糖指数GI</div>
                     <div class="detail-value">
                         <span class="gi-value">${food.gi || '—'}</span>
                         ${giLevelText ? '<span class="gi-level ' + giLevelClass + '">' + giLevelText + '</span>' : ''}
                     </div>
-                    <div style="font-size:12px;color:#6b7280;margin-top:6px;">💡 GI值越低，食物升糖越慢</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">🏷️ 所属区块</div>
-                    <div class="detail-value">
-                        <span class="badge ${blockClass}">${blockIcon} ${blockText}</span>
-                    </div>
+                    <div class="tips gi">🔔 GI值越低，越有助于降低餐后血糖波动和长期控糖指标。</div>
                 </div>
             `;
             document.getElementById('detailModal').classList.add('show');
         }
         
         function initFilters() {
-            document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(btn => {
+            document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red, .filter-btn.black').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const v = btn.dataset.filter;
                     if (currentBlockFilter === v) {
                         currentBlockFilter = 'all';
                         btn.classList.remove('active');
                     } else {
-                        document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red, .filter-btn.black').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
                         currentBlockFilter = v;
                     }
@@ -795,7 +539,7 @@
         
         function initModal() {
             const modal = document.getElementById('detailModal');
-            const closeBtn = document.querySelector('.close-btn');
+            const closeBtn = modal.querySelector('.close-btn');
             closeBtn.addEventListener('click', () => modal.classList.remove('show'));
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
         }

@@ -228,7 +228,7 @@
             background: #10b981;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border-radius: 40px;
             cursor: pointer;
             font-size: 14px;
@@ -301,7 +301,7 @@
         
         .badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
@@ -310,6 +310,7 @@
         .badge-green { background: #d1fae5; color: #065f46; }
         .badge-yellow { background: #fed7aa; color: #92400e; }
         .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-black { background: #3d5074; color: white; }
         .badge-high-protein { font-size: 14px; }
         
         .modal {
@@ -651,7 +652,7 @@
                     <div class="filter-row">
                         <div class="filter-group"><label>一级分类</label><select id="filterCategory1"><option value="all">全部</option></select></div>
                         <div class="filter-group"><label>二级分类</label><select id="filterCategory2"><option value="all">全部</option></select></div>
-                        <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select></div>
+                        <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option><option value="black">🚫 禁止食品</option></select></div>
                         <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">✅ 是</option><option value="low">❌ 否</option></select></div>
                     </div>
                 </div>
@@ -692,11 +693,11 @@
                 <div class="form-group"><label>作用/功效</label><textarea id="effect" rows="4"></textarea></div>
                 <div class="form-row">
                     <div class="form-group"><label>GI值</label><input type="number" id="gi" step="1" oninput="autoSelectBlockByGI()"></div>
-                    <div class="form-group"><label>所属区块 *</label><select id="block"><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select><div class="help-text" id="blockHint"></div></div>
+                    <div class="form-group"><label>所属区块 *</label><select id="block"><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option><option value="black">🚫 禁止食品</option></select><div class="help-text" id="blockHint"></div></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>蛋白质含量 (g/100g)</label><input type="number" id="protein" step="0.1" oninput="autoCheckHighProtein()"></div>
-                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="isHighProtein"><label>✅ 是食品</label></div><div class="help-text" id="proteinHint">≥10g/100g 会自动勾选</div></div>
+                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="isHighProtein"><label>🥚 高蛋白</label></div><div class="help-text" id="proteinHint">≥10g/100g 会自动勾选</div></div>
                 </div>
                 <button type="submit" class="submit-btn">保存</button>
             </form>
@@ -951,8 +952,8 @@
             if (pageFoods.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-table">暂无数据</td></tr>'; document.getElementById('foodPagination').innerHTML = ''; return; }
             let html = '';
             for (let f of pageFoods) {
-                const blockClass = f.block === 'green' ? 'badge-green' : (f.block === 'yellow' ? 'badge-yellow' : 'badge-red');
-                const blockText = f.block === 'green' ? '绿灯' : (f.block === 'yellow' ? '黄灯' : '红灯');
+                const blockClass = f.block === 'green' ? 'badge-green' : (f.block === 'yellow' ? 'badge-yellow' : (f.block === 'black' ? 'badge-black' : 'badge-red'));
+                const blockText = f.block === 'green' ? '🟢 绿灯' : (f.block === 'yellow' ? '🟡 黄灯' : (f.block === 'black' ? '🚫 禁食' : '🔴 红灯'));
                 const proteinDisplay = f.protein ? f.protein + 'g' : '-';
                 const highProteinBadge = f.isHighProtein ? '<span class=" badge-high-protein">✅ 是</span>' : '-';
                 html += '<tr>';
@@ -1160,15 +1161,25 @@
             }
             level2Select.innerHTML = html;
         }
-        
+
         function autoSelectBlockByGI() {
             const gi = parseInt(document.getElementById('gi').value);
             const block = document.getElementById('block');
             const hint = document.getElementById('blockHint');
             if (isNaN(gi)) { hint.innerHTML = ''; return; }
-            if (gi <= 55) { block.value = 'green'; hint.innerHTML = '✨ 根据GI值自动推荐：绿灯食品'; }
-            else if (gi <= 69) { block.value = 'yellow'; hint.innerHTML = '✨ 根据GI值自动推荐：黄灯食品'; }
-            else { block.value = 'red'; hint.innerHTML = '✨ 根据GI值自动推荐：红灯食品'; }
+            if (gi <= 55) { 
+                block.value = 'green'; 
+                hint.innerHTML = '✨ 根据GI值自动推荐：绿灯食品'; 
+            } else if (gi <= 69) { 
+                block.value = 'yellow'; 
+                hint.innerHTML = '✨ 根据GI值自动推荐：黄灯食品'; 
+            } else if (gi <= 84) { 
+                block.value = 'red'; 
+                hint.innerHTML = '✨ 根据GI值自动推荐：红灯食品'; 
+            } else { 
+                block.value = 'black'; 
+                hint.innerHTML = '✨ 根据GI值自动推荐：禁止食品'; 
+            }
         }
         
         function autoCheckHighProtein() {

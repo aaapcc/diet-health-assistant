@@ -5,270 +5,819 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>饮食健康助手 - 食品查询</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui;background:#f5f7fa;padding-bottom:30px}
-        .header{background:linear-gradient(135deg,#10b981,#059669);color:white;padding:24px 20px}
-        .header h1{font-size:28px;margin-bottom:8px}
-        .header p{font-size:14px;opacity:.9}
-        .container{max-width:1200px;margin:0 auto;padding:20px 16px}
-        .search-input{width:100%;padding:14px 18px;border:1px solid #e5e7eb;border-radius:40px;font-size:16px;margin-bottom:20px;background:white}
-        .filter-section{margin-bottom:20px}
-        .filter-title{font-size:13px;color:#6b7280;margin-bottom:8px}
-        .filter-group{display:flex;gap:12px;flex-wrap:wrap}
-        .filter-btn{padding:10px 20px;border:none;border-radius:40px;font-size:14px;font-weight:600;cursor:pointer;background:white;border:2px solid #e5e7eb}
-        .filter-btn.active{border-width:2px}
-        .filter-btn.green{color:#10b981;border-color:#10b981}
-        .filter-btn.green.active{background:#10b981;color:white}
-        .filter-btn.yellow{color:#f59e0b;border-color:#f59e0b}
-        .filter-btn.yellow.active{background:#f59e0b;color:white}
-        .filter-btn.red{color:#ef4444;border-color:#ef4444}
-        .filter-btn.red.active{background:#ef4444;color:white}
-        .filter-btn.high-protein{color:#3b82f6;border-color:#3b82f6}
-        .filter-btn.high-protein.active{background:#3b82f6;color:white}
-        .filter-btn.low-protein{color:#6b7280;border-color:#6b7280}
-        .filter-btn.low-protein.active{background:#6b7280;color:white}
-        .category-section{margin-bottom:20px}
-        .category-nav{display:flex;gap:10px;flex-wrap:wrap}
-        .category-item{padding:8px 20px;background:white;border-radius:40px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid #e5e7eb;color:#4b5563}
-        .category-item.active{background:#10b981;color:white}
-        .subcategory-section{margin-bottom:20px;padding-left:8px;border-left:3px solid #10b981}
-        .subcategory-nav{display:flex;gap:10px;flex-wrap:wrap}
-        .subcategory-item{padding:6px 16px;background:#f3f4f6;border-radius:40px;font-size:13px;font-weight:500;cursor:pointer;color:#4b5563}
-        .subcategory-item.active{background:#10b981;color:white}
-        .stats{margin-bottom:16px;font-size:14px;color:#6b7280}
-        .food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-        @media(min-width:768px){.food-grid{grid-template-columns:repeat(3,1fr)}}
-        @media(min-width:1024px){.food-grid{grid-template-columns:repeat(4,1fr)}}
-        .food-card{background:white;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
-        .food-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.12)}
-        .card-header{padding:14px;border-left:4px solid}
-        .card-header.green{border-left-color:#10b981}
-        .card-header.yellow{border-left-color:#f59e0b}
-        .card-header.red{border-left-color:#ef4444}
-        .food-name{font-size:16px;font-weight:700}
-        .food-alias{font-size:11px;color:#9ca3af;margin:4px 0 8px}
-        .food-tags{display:flex;flex-wrap:wrap;gap:6px}
-        .tag{background:#f3f4f6;padding:3px 8px;border-radius:20px;font-size:10px}
-        .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px}
-        .badge.green{background:#d1fae5;color:#065f46}
-        .badge.yellow{background:#fed7aa;color:#92400e}
-        .badge.red{background:#fee2e2;color:#991b1b}
-        .badge.high-protein{background:#dbeafe;color:#1e40af}
-        .empty-state{text-align:center;padding:60px;color:#9ca3af;grid-column:1/-1}
-        .pagination{display:flex;justify-content:center;gap:12px;margin-top:24px}
-        .page-btn{padding:8px 20px;border:1px solid #e5e7eb;background:white;border-radius:40px;cursor:pointer}
-        .page-btn.disabled{opacity:.5}
-        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;z-index:1000}
-        .modal.show{display:flex}
-        .modal-content{background:white;border-radius:24px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;padding:24px}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #f3f4f6;padding-bottom:12px}
-        .modal-header h3{font-size:24px}
-        .close-btn{font-size:28px;cursor:pointer;color:#9ca3af}
-        .detail-row{margin-bottom:20px}
-        .detail-label{font-weight:600;color:#6b7280;font-size:13px;margin-bottom:8px}
-        .detail-value{font-size:15px}
-        .gi-value{font-size:32px;font-weight:700}
-        .gi-level{display:inline-block;padding:4px 14px;border-radius:30px;font-size:14px;margin-left:12px}
-        .gi-level.low{background:#d1fae5;color:#065f46}
-        .gi-level.medium{background:#fed7aa;color:#92400e}
-        .gi-level.high{background:#fee2e2;color:#991b1b}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
+            color: #1f2937;
+            padding-bottom: 30px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 24px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 40px;
+            font-size: 16px;
+            outline: none;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .search-input:focus {
+            border-color: #10b981;
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+        }
+        
+        .filter-title {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .filter-btn.active {
+            border-width: 2px;
+        }
+        
+        .filter-btn.green { color: #10b981; border-color: #10b981; }
+        .filter-btn.green.active { background: #10b981; color: white; }
+        .filter-btn.yellow { color: #f59e0b; border-color: #f59e0b; }
+        .filter-btn.yellow.active { background: #f59e0b; color: white; }
+        .filter-btn.red { color: #ef4444; border-color: #ef4444; }
+        .filter-btn.red.active { background: #ef4444; color: white; }
+        .filter-btn.high-protein { color: #3b82f6; border-color: #3b82f6; }
+        .filter-btn.high-protein.active { background: #3b82f6; color: white; }
+        .filter-btn.low-protein { color: #6b7280; border-color: #6b7280; }
+        .filter-btn.low-protein.active { background: #6b7280; color: white; }
+        
+        .category-section {
+            margin-bottom: 20px;
+        }
+        
+        .category-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .category-item {
+            padding: 8px 20px;
+            background: white;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        
+        .category-item.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .subcategory-section {
+            margin-bottom: 20px;
+            padding-left: 8px;
+            border-left: 3px solid #10b981;
+        }
+        
+        .subcategory-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .subcategory-item {
+            padding: 6px 16px;
+            background: #f3f4f6;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #4b5563;
+        }
+        
+        .subcategory-item.active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .stats {
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #6b7280;
+            padding: 8px 0;
+        }
+        
+        /* 食品卡片网格 - 图片在上方布局 */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        @media (min-width: 640px) {
+            .food-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .food-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .food-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .food-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .food-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* 图片区域 */
+        .food-image {
+            width: 100%;
+            height: 120px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .food-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .food-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #9ca3af;
+            font-size: 32px;
+        }
+        
+        .food-image-placeholder span:first-child {
+            font-size: 48px;
+        }
+        
+        .food-image-placeholder span:last-child {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        /* 卡片内容区域 */
+        .card-content {
+            padding: 12px;
+            border-left: 4px solid;
+        }
+        
+        .card-content.green { border-left-color: #10b981; }
+        .card-content.yellow { border-left-color: #f59e0b; }
+        .card-content.red { border-left-color: #ef4444; }
+        
+        .food-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .food-alias {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .food-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 500;
+            background: #f3f4f6;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .badge.green { background: #d1fae5; color: #065f46; }
+        .badge.yellow { background: #fed7aa; color: #92400e; }
+        .badge.red { background: #fee2e2; color: #991b1b; }
+        .badge.high-protein { background: #dbeafe; color: #1e40af; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+            grid-column: 1 / -1;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+            padding: 16px 0;
+        }
+        
+        .page-btn {
+            padding: 8px 20px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            padding: 8px 16px;
+            color: #6b7280;
+        }
+        
+        /* 详情弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .modal-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        /* 详情弹窗图片 */
+        .detail-image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .detail-image img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #f3f4f6;
+        }
+        
+        .detail-image-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border-radius: 16px;
+            color: #9ca3af;
+        }
+        
+        .detail-image-placeholder span:first-child {
+            font-size: 64px;
+        }
+        
+        .detail-image-placeholder span:last-child {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .detail-row {
+            margin-bottom: 20px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+        
+        .gi-value {
+            font-size: 32px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        
+        .gi-level {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .gi-level.low { background: #d1fae5; color: #065f46; }
+        .gi-level.medium { background: #fed7aa; color: #92400e; }
+        .gi-level.high { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
-<div class="header"><h1><span>🍎</span> 饮食健康助手</h1><p>管住嘴 · 迈开腿 · 科学饮食 · 健康控糖</p></div>
-<div class="container">
-<input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索菜名或别名...">
-<div class="filter-section"><div class="filter-title">📊 食品分类</div><div class="filter-group"><button class="filter-btn green" data-filter="green">🟢 绿灯食品</button><button class="filter-btn yellow" data-filter="yellow">🟡 黄灯食品</button><button class="filter-btn red" data-filter="red">🔴 红灯食品</button></div></div>
-<div class="filter-section"><div class="filter-title">💪 蛋白质</div><div class="filter-group"><button class="filter-btn high-protein" data-protein="high">🥩 高蛋白</button><button class="filter-btn low-protein" data-protein="low">❌ 非高蛋白</button></div></div>
-<div class="category-section"><div class="filter-title">📂 食品大类</div><div class="category-nav" id="categoryNav"></div></div>
-<div id="subcategorySection" class="subcategory-section" style="display:none"><div class="filter-title">🔍 细分类</div><div id="subcategoryNav" class="subcategory-nav"></div></div>
-<div class="stats" id="stats"></div><div id="foodGrid" class="food-grid"></div><div id="pagination" class="pagination"></div></div>
-<div id="detailModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle"></h3><span class="close-btn">&times;</span></div><div id="modalBody"></div></div></div>
-<script>
-// 配置API地址（部署后修改为你的Worker域名）
-const API_BASE = 'https://diet-health-assistant-api.aaqq.site';
-
-let allFoods = [], categories = { level1: [] };
-let currentPage = 1, PAGE_SIZE = 10;
-let currentBlockFilter = 'all', currentProteinFilter = 'all', currentCategory = 'all', currentSubCategory = 'all';
-
-async function loadData() {
-    try {
-        const [foodsRes, catsRes] = await Promise.all([
-            fetch(API_BASE + '/api/foods'),
-            fetch(API_BASE + '/api/categories')
-        ]);
-        allFoods = await foodsRes.json();
-        categories = await catsRes.json();
-        renderCategories();
-        renderSubcategories();
-        renderFoods();
-    } catch(e) { console.error('加载失败:', e); }
-}
-
-function getBlockIcon(block) { return block === 'green' ? '🟢' : (block === 'yellow' ? '🟡' : '🔴'); }
-function getBlockText(block) { return block === 'green' ? '绿灯食品' : (block === 'yellow' ? '黄灯食品' : '红灯食品'); }
-
-function getFilteredFoods() {
-    let filtered = [...allFoods];
-    if (currentBlockFilter !== 'all') filtered = filtered.filter(f => f.block === currentBlockFilter);
-    if (currentProteinFilter === 'high') filtered = filtered.filter(f => f.isHighProtein === true);
-    else if (currentProteinFilter === 'low') filtered = filtered.filter(f => f.isHighProtein === false);
-    if (currentCategory !== 'all') {
-        const level1 = categories.level1.find(c => c.id === currentCategory);
-        if (level1) filtered = filtered.filter(f => f.categoryLevel1 === level1.name);
-    }
-    if (currentSubCategory !== 'all' && currentCategory !== 'all') {
-        const level1 = categories.level1.find(c => c.id === currentCategory);
-        if (level1) {
-            const sub = level1.subcategories.find(s => s.id === currentSubCategory);
-            if (sub) filtered = filtered.filter(f => f.categoryLevel2 === sub.name);
+    <div class="header">
+        <h1><span>🍎</span> 饮食健康助手</h1>
+        <p>管住嘴 · 迈开腿 · 科学饮食 · 健康控糖</p>
+    </div>
+    
+    <div class="container">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索菜名或别名...">
+        
+        <div class="filter-section">
+            <div class="filter-title">📊 食品分类</div>
+            <div class="filter-group">
+                <button class="filter-btn green" data-filter="green">🟢 绿灯食品</button>
+                <button class="filter-btn yellow" data-filter="yellow">🟡 黄灯食品</button>
+                <button class="filter-btn red" data-filter="red">🔴 红灯食品</button>
+            </div>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-title">💪 蛋白质</div>
+            <div class="filter-group">
+                <button class="filter-btn high-protein" data-protein="high">🥩 高蛋白</button>
+                <button class="filter-btn low-protein" data-protein="low">❌ 非高蛋白</button>
+            </div>
+        </div>
+        
+        <div class="category-section">
+            <div class="filter-title">📂 食品大类</div>
+            <div class="category-nav" id="categoryNav"></div>
+        </div>
+        
+        <div id="subcategorySection" class="subcategory-section" style="display: none;">
+            <div class="filter-title">🔍 细分类</div>
+            <div id="subcategoryNav" class="subcategory-nav"></div>
+        </div>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div id="foodGrid" class="food-grid"></div>
+        
+        <div id="pagination" class="pagination"></div>
+    </div>
+    
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 配置API地址
+        const API_BASE = 'https://diet-health-assistant-api.aaqq.site';
+        
+        let allFoods = [], categories = { level1: [] };
+        let currentPage = 1, PAGE_SIZE = 10;
+        let currentBlockFilter = 'all', currentProteinFilter = 'all', currentCategory = 'all', currentSubCategory = 'all';
+        
+        async function loadData() {
+            try {
+                const [foodsRes, catsRes] = await Promise.all([
+                    fetch(API_BASE + '/api/foods'),
+                    fetch(API_BASE + '/api/categories')
+                ]);
+                allFoods = await foodsRes.json();
+                categories = await catsRes.json();
+                renderCategories();
+                renderSubcategories();
+                renderFoods();
+            } catch(e) { console.error('加载失败:', e); }
         }
-    }
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    if (searchTerm) filtered = filtered.filter(f => f.name.toLowerCase().includes(searchTerm) || (f.alias && f.alias.toLowerCase().includes(searchTerm)));
-    return filtered;
-}
-
-function renderCategories() {
-    const nav = document.getElementById('categoryNav');
-    let html = '<div class="category-item ' + (currentCategory === 'all' ? 'active' : '') + '" data-category="all">📋 全部</div>';
-    (categories.level1 || []).sort((a,b) => a.order - b.order).forEach(c => {
-        html += '<div class="category-item ' + (currentCategory === c.id ? 'active' : '') + '" data-category="' + c.id + '">' + c.name + '</div>';
-    });
-    nav.innerHTML = html;
-    document.querySelectorAll('.category-item').forEach(item => {
-        item.addEventListener('click', () => {
-            currentCategory = item.dataset.category;
-            currentSubCategory = 'all';
-            currentPage = 1;
-            renderCategories();
-            renderSubcategories();
-            renderFoods();
-        });
-    });
-}
-
-function renderSubcategories() {
-    const section = document.getElementById('subcategorySection');
-    const nav = document.getElementById('subcategoryNav');
-    if (currentCategory === 'all') { section.style.display = 'none'; return; }
-    section.style.display = 'block';
-    const level1 = categories.level1.find(c => c.id === currentCategory);
-    if (!level1 || !level1.subcategories.length) { nav.innerHTML = ''; return; }
-    let html = '<div class="subcategory-item ' + (currentSubCategory === 'all' ? 'active' : '') + '" data-subcategory="all">全部</div>';
-    level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
-        html += '<div class="subcategory-item ' + (currentSubCategory === sub.id ? 'active' : '') + '" data-subcategory="' + sub.id + '">' + sub.name + '</div>';
-    });
-    nav.innerHTML = html;
-    document.querySelectorAll('.subcategory-item').forEach(item => {
-        item.addEventListener('click', () => {
-            currentSubCategory = item.dataset.subcategory;
-            currentPage = 1;
-            renderSubcategories();
-            renderFoods();
-        });
-    });
-}
-
-function renderFoods() {
-    const filtered = getFilteredFoods();
-    const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const pageFoods = filtered.slice(start, start + PAGE_SIZE);
-    document.getElementById('stats').innerHTML = '找到 ' + filtered.length + ' 种食品';
-    const grid = document.getElementById('foodGrid');
-    if (pageFoods.length === 0) { grid.innerHTML = '<div class="empty-state">😊 没有找到相关食品</div>'; document.getElementById('pagination').innerHTML = ''; return; }
-    let html = '';
-    for (let f of pageFoods) {
-        const blockClass = f.block;
-        const blockIcon = getBlockIcon(f.block);
-        const blockText = getBlockText(f.block);
-        const giDisplay = f.gi && f.gi > 0 ? 'GI: ' + f.gi : 'GI: 无';
-        const highProteinTag = f.isHighProtein ? '<span class="badge high-protein">🥩 高蛋白</span>' : '';
-        html += '<div class="food-card" data-id="' + f.id + '"><div class="card-header ' + blockClass + '"><div class="food-name">' + f.name + '</div><div class="food-alias">' + (f.alias || '暂无别名') + '</div><div class="food-tags"><span class="tag">🍚 ' + giDisplay + '</span><span class="badge ' + blockClass + '">' + blockIcon + ' ' + blockText + '</span>' + highProteinTag + '</div></div></div>';
-    }
-    grid.innerHTML = html;
-    document.querySelectorAll('.food-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const food = allFoods.find(f => f.id === card.dataset.id);
-            if (food) showDetail(food);
-        });
-    });
-    renderPagination(totalPages);
-}
-
-function renderPagination(totalPages) {
-    const div = document.getElementById('pagination');
-    if (totalPages <= 1) { div.innerHTML = ''; return; }
-    div.innerHTML = '<button class="page-btn ' + (currentPage === 1 ? 'disabled' : '') + '" onclick="changePage(' + (currentPage - 1) + ')">上一页</button><span class="page-info">第 ' + currentPage + ' / ' + totalPages + ' 页</span><button class="page-btn ' + (currentPage === totalPages ? 'disabled' : '') + '" onclick="changePage(' + (currentPage + 1) + ')">下一页</button>';
-}
-
-function changePage(page) { currentPage = page; renderFoods(); }
-
-function showDetail(food) {
-    const blockIcon = getBlockIcon(food.block);
-    const blockText = getBlockText(food.block);
-    const blockClass = food.block;
-    let giLevelText = '', giLevelClass = '';
-    if (food.gi && food.gi > 0) {
-        if (food.gi <= 55) { giLevelText = '低GI'; giLevelClass = 'low'; }
-        else if (food.gi <= 69) { giLevelText = '中GI'; giLevelClass = 'medium'; }
-        else { giLevelText = '高GI'; giLevelClass = 'high'; }
-    }
-    const fullCategory = food.categoryLevel1 + (food.categoryLevel2 ? ' > ' + food.categoryLevel2 : '');
-    const highProteinTag = food.isHighProtein ? '<span class="badge high-protein" style="margin-left:8px">🥩 高蛋白</span>' : '';
-    document.getElementById('modalTitle').innerHTML = food.name + highProteinTag;
-    document.getElementById('modalBody').innerHTML = '<div class="detail-row"><div class="detail-label">📝 别名</div><div class="detail-value">' + (food.alias || '无') + '</div></div><div class="detail-row"><div class="detail-label">📂 分类</div><div class="detail-value">' + fullCategory + '</div></div><div class="detail-row"><div class="detail-label">✨ 作用/功效</div><div class="detail-value">' + (food.effect || '暂无信息') + '</div></div><div class="detail-row"><div class="detail-label">🍚 升糖指数 (GI)</div><div class="detail-value"><span class="gi-value">' + (food.gi || '—') + '</span>' + (giLevelText ? '<span class="gi-level ' + giLevelClass + '">' + giLevelText + '</span>' : '') + '</div><div style="font-size:12px;color:#6b7280;margin-top:6px;">💡 GI值越低，食物升糖越慢</div></div><div class="detail-row"><div class="detail-label">🏷️ 所属区块</div><div class="detail-value"><span class="badge ' + blockClass + '">' + blockIcon + ' ' + blockText + '</span></div></div>';
-    document.getElementById('detailModal').classList.add('show');
-}
-
-function initFilters() {
-    document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const v = btn.dataset.filter;
-            if (currentBlockFilter === v) { currentBlockFilter = 'all'; btn.classList.remove('active'); }
-            else { document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentBlockFilter = v; }
-            currentPage = 1; renderFoods();
-        });
-    });
-    const highBtn = document.querySelector('.filter-btn.high-protein'), lowBtn = document.querySelector('.filter-btn.low-protein');
-    highBtn.addEventListener('click', () => {
-        if (currentProteinFilter === 'high') { currentProteinFilter = 'all'; highBtn.classList.remove('active'); lowBtn.classList.remove('active'); }
-        else { currentProteinFilter = 'high'; highBtn.classList.add('active'); lowBtn.classList.remove('active'); }
-        currentPage = 1; renderFoods();
-    });
-    lowBtn.addEventListener('click', () => {
-        if (currentProteinFilter === 'low') { currentProteinFilter = 'all'; lowBtn.classList.remove('active'); highBtn.classList.remove('active'); }
-        else { currentProteinFilter = 'low'; lowBtn.classList.add('active'); highBtn.classList.remove('active'); }
-        currentPage = 1; renderFoods();
-    });
-}
-
-function initSearch() {
-    const input = document.getElementById('searchInput');
-    let timeout;
-    input.addEventListener('input', () => {
-        clearTimeout(timeout);
-        if (input.value.trim().length > 0) {
-            currentBlockFilter = 'all'; currentProteinFilter = 'all'; currentCategory = 'all'; currentSubCategory = 'all'; currentPage = 1;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            renderCategories(); renderSubcategories();
+        
+        function getBlockIcon(block) {
+            return block === 'green' ? '🟢' : (block === 'yellow' ? '🟡' : '🔴');
         }
-        timeout = setTimeout(() => { currentPage = 1; renderFoods(); }, 300);
-    });
-}
-
-function initModal() {
-    const modal = document.getElementById('detailModal'), closeBtn = document.querySelector('.close-btn');
-    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
-}
-
-loadData();
-setTimeout(() => { initFilters(); initSearch(); initModal(); }, 100);
-</script>
+        
+        function getBlockText(block) {
+            return block === 'green' ? '绿灯食品' : (block === 'yellow' ? '黄灯食品' : '红灯食品');
+        }
+        
+        // 获取图片HTML
+        function getImageHtml(imageUrl, name) {
+            if (imageUrl && imageUrl.trim() !== '') {
+                return `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" onerror="this.onerror=null; this.parentElement.innerHTML=this.parentElement.innerHTML.replace('<img','<div').replace('img','div')">`;
+            }
+            return `<div class="food-image-placeholder"><span>🥗</span><span>暂无图片</span></div>`;
+        }
+        
+        function getDetailImageHtml(imageUrl, name) {
+            if (imageUrl && imageUrl.trim() !== '') {
+                return `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'detail-image-placeholder\'><span>🥗</span><span>暂无图片</span></div>'">`;
+            }
+            return `<div class="detail-image-placeholder"><span>🥗</span><span>暂无图片</span></div>`;
+        }
+        
+        function getFilteredFoods() {
+            let filtered = [...allFoods];
+            if (currentBlockFilter !== 'all') {
+                filtered = filtered.filter(food => food.block === currentBlockFilter);
+            }
+            if (currentProteinFilter === 'high') {
+                filtered = filtered.filter(food => food.isHighProtein === true);
+            } else if (currentProteinFilter === 'low') {
+                filtered = filtered.filter(food => food.isHighProtein === false);
+            }
+            if (currentCategory !== 'all') {
+                const level1 = categories.level1.find(c => c.id === currentCategory);
+                if (level1) filtered = filtered.filter(food => food.categoryLevel1 === level1.name);
+            }
+            if (currentSubCategory !== 'all' && currentCategory !== 'all') {
+                const level1 = categories.level1.find(c => c.id === currentCategory);
+                if (level1) {
+                    const sub = level1.subcategories.find(s => s.id === currentSubCategory);
+                    if (sub) filtered = filtered.filter(food => food.categoryLevel2 === sub.name);
+                }
+            }
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchTerm) {
+                filtered = filtered.filter(food => 
+                    food.name.toLowerCase().includes(searchTerm) ||
+                    (food.alias && food.alias.toLowerCase().includes(searchTerm))
+                );
+            }
+            return filtered;
+        }
+        
+        function renderCategories() {
+            const nav = document.getElementById('categoryNav');
+            let html = '<div class="category-item ' + (currentCategory === 'all' ? 'active' : '') + '" data-category="all">📋 全部</div>';
+            (categories.level1 || []).sort((a,b) => a.order - b.order).forEach(c => {
+                html += '<div class="category-item ' + (currentCategory === c.id ? 'active' : '') + '" data-category="' + c.id + '">' + escapeHtml(c.name) + '</div>';
+            });
+            nav.innerHTML = html;
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentCategory = item.dataset.category;
+                    currentSubCategory = 'all';
+                    currentPage = 1;
+                    renderCategories();
+                    renderSubcategories();
+                    renderFoods();
+                });
+            });
+        }
+        
+        function renderSubcategories() {
+            const section = document.getElementById('subcategorySection');
+            const nav = document.getElementById('subcategoryNav');
+            if (currentCategory === 'all') {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            const level1 = categories.level1.find(c => c.id === currentCategory);
+            if (!level1 || !level1.subcategories.length) {
+                nav.innerHTML = '';
+                return;
+            }
+            let html = '<div class="subcategory-item ' + (currentSubCategory === 'all' ? 'active' : '') + '" data-subcategory="all">全部</div>';
+            level1.subcategories.sort((a,b) => a.order - b.order).forEach(sub => {
+                html += '<div class="subcategory-item ' + (currentSubCategory === sub.id ? 'active' : '') + '" data-subcategory="' + sub.id + '">' + escapeHtml(sub.name) + '</div>';
+            });
+            nav.innerHTML = html;
+            document.querySelectorAll('.subcategory-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentSubCategory = item.dataset.subcategory;
+                    currentPage = 1;
+                    renderSubcategories();
+                    renderFoods();
+                });
+            });
+        }
+        
+        function renderFoods() {
+            const filtered = getFilteredFoods();
+            const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageFoods = filtered.slice(start, start + PAGE_SIZE);
+            document.getElementById('stats').innerHTML = '找到 ' + filtered.length + ' 种食品';
+            const grid = document.getElementById('foodGrid');
+            if (pageFoods.length === 0) {
+                grid.innerHTML = '<div class="empty-state">😊 没有找到相关食品</div>';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            let html = '';
+            for (let f of pageFoods) {
+                const blockClass = f.block;
+                const blockIcon = getBlockIcon(f.block);
+                const blockText = getBlockText(f.block);
+                const giDisplay = f.gi && f.gi > 0 ? 'GI: ' + f.gi : 'GI: 无';
+                const highProteinTag = f.isHighProtein ? '<span class="badge high-protein">🥩 高蛋白</span>' : '';
+                const imageHtml = getImageHtml(f.image, f.name);
+                
+                html += '<div class="food-card" data-id="' + f.id + '">';
+                html += '<div class="food-image">' + imageHtml + '</div>';
+                html += '<div class="card-content ' + blockClass + '">';
+                html += '<div class="food-name">' + escapeHtml(f.name) + '</div>';
+                html += '<div class="food-alias">' + (f.alias ? escapeHtml(f.alias) : '暂无别名') + '</div>';
+                html += '<div class="food-tags">';
+                html += '<span class="tag">🍚 ' + giDisplay + '</span>';
+                html += '<span class="badge ' + blockClass + '">' + blockIcon + ' ' + blockText + '</span>';
+                html += highProteinTag;
+                html += '</div></div></div>';
+            }
+            grid.innerHTML = html;
+            document.querySelectorAll('.food-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const food = allFoods.find(f => f.id === card.dataset.id);
+                    if (food) showDetail(food);
+                });
+            });
+            renderPagination(totalPages);
+        }
+        
+        function renderPagination(totalPages) {
+            const div = document.getElementById('pagination');
+            if (totalPages <= 1) { div.innerHTML = ''; return; }
+            div.innerHTML = '<button class="page-btn ' + (currentPage === 1 ? 'disabled' : '') + '" onclick="changePage(' + (currentPage - 1) + ')">上一页</button><span class="page-info">第 ' + currentPage + ' / ' + totalPages + ' 页</span><button class="page-btn ' + (currentPage === totalPages ? 'disabled' : '') + '" onclick="changePage(' + (currentPage + 1) + ')">下一页</button>';
+        }
+        
+        function changePage(page) { currentPage = page; renderFoods(); }
+        
+        function showDetail(food) {
+            const blockIcon = getBlockIcon(food.block);
+            const blockText = getBlockText(food.block);
+            const blockClass = food.block;
+            let giLevelText = '', giLevelClass = '';
+            if (food.gi && food.gi > 0) {
+                if (food.gi <= 55) { giLevelText = '低GI'; giLevelClass = 'low'; }
+                else if (food.gi <= 69) { giLevelText = '中GI'; giLevelClass = 'medium'; }
+                else { giLevelText = '高GI'; giLevelClass = 'high'; }
+            }
+            const fullCategory = food.categoryLevel1 + (food.categoryLevel2 ? ' > ' + food.categoryLevel2 : '');
+            const highProteinTag = food.isHighProtein ? '<span class="badge high-protein" style="margin-left:8px">🥩 高蛋白</span>' : '';
+            const imageHtml = getDetailImageHtml(food.image, food.name);
+            
+            document.getElementById('modalTitle').innerHTML = escapeHtml(food.name) + highProteinTag;
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-image">${imageHtml}</div>
+                <div class="detail-row">
+                    <div class="detail-label">📝 别名</div>
+                    <div class="detail-value">${escapeHtml(food.alias || '无')}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">📂 分类</div>
+                    <div class="detail-value">${escapeHtml(fullCategory)}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">✨ 作用/功效</div>
+                    <div class="detail-value">${escapeHtml(food.effect || '暂无信息')}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">🍚 升糖指数 (GI)</div>
+                    <div class="detail-value">
+                        <span class="gi-value">${food.gi || '—'}</span>
+                        ${giLevelText ? '<span class="gi-level ' + giLevelClass + '">' + giLevelText + '</span>' : ''}
+                    </div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:6px;">💡 GI值越低，食物升糖越慢</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">🏷️ 所属区块</div>
+                    <div class="detail-value">
+                        <span class="badge ${blockClass}">${blockIcon} ${blockText}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('show');
+        }
+        
+        function initFilters() {
+            document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = btn.dataset.filter;
+                    if (currentBlockFilter === v) {
+                        currentBlockFilter = 'all';
+                        btn.classList.remove('active');
+                    } else {
+                        document.querySelectorAll('.filter-btn.green, .filter-btn.yellow, .filter-btn.red').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentBlockFilter = v;
+                    }
+                    currentPage = 1;
+                    renderFoods();
+                });
+            });
+            const highBtn = document.querySelector('.filter-btn.high-protein'), lowBtn = document.querySelector('.filter-btn.low-protein');
+            highBtn.addEventListener('click', () => {
+                if (currentProteinFilter === 'high') {
+                    currentProteinFilter = 'all';
+                    highBtn.classList.remove('active');
+                    lowBtn.classList.remove('active');
+                } else {
+                    currentProteinFilter = 'high';
+                    highBtn.classList.add('active');
+                    lowBtn.classList.remove('active');
+                }
+                currentPage = 1;
+                renderFoods();
+            });
+            lowBtn.addEventListener('click', () => {
+                if (currentProteinFilter === 'low') {
+                    currentProteinFilter = 'all';
+                    lowBtn.classList.remove('active');
+                    highBtn.classList.remove('active');
+                } else {
+                    currentProteinFilter = 'low';
+                    lowBtn.classList.add('active');
+                    highBtn.classList.remove('active');
+                }
+                currentPage = 1;
+                renderFoods();
+            });
+        }
+        
+        function initSearch() {
+            const input = document.getElementById('searchInput');
+            let timeout;
+            input.addEventListener('input', () => {
+                clearTimeout(timeout);
+                if (input.value.trim().length > 0) {
+                    currentBlockFilter = 'all';
+                    currentProteinFilter = 'all';
+                    currentCategory = 'all';
+                    currentSubCategory = 'all';
+                    currentPage = 1;
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    renderCategories();
+                    renderSubcategories();
+                }
+                timeout = setTimeout(() => { currentPage = 1; renderFoods(); }, 300);
+            });
+        }
+        
+        function initModal() {
+            const modal = document.getElementById('detailModal');
+            const closeBtn = document.querySelector('.close-btn');
+            closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+        }
+        
+        function escapeHtml(str) {
+            if (str === undefined || str === null) return '';
+            // 如果是数组，先转成字符串（用顿号连接）
+            if (Array.isArray(str)) {
+                str = str.join('、');
+            }
+            // 确保是字符串
+            const s = String(str);
+            return s.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        loadData();
+        setTimeout(() => { initFilters(); initSearch(); initModal(); }, 100);
+    </script>
 </body>
 </html>

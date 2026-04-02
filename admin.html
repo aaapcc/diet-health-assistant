@@ -647,6 +647,7 @@
                 <input type="hidden" id="foodId">
                 <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
                 <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用英文逗号分隔，如：土豆,马铃薯,洋芋"></div>
+                <div class="form-group"><label>图片URL</label><input type="text" id="image" placeholder="输入图片Url"></div>
                 <div class="form-row">
                     <div class="form-group"><label>一级分类 *</label><select id="categoryLevel1" required onchange="updateSubcategories()"><option value="">请选择</option></select></div>
                     <div class="form-group"><label>二级分类</label><select id="categoryLevel2"><option value="">请先选择一级分类</option></select></div>
@@ -1077,6 +1078,7 @@
             document.getElementById('foodId').value = food.id;
             document.getElementById('name').value = food.name;
             document.getElementById('alias').value = food.alias || '';
+            document.getElementById('image').value = food.image || '';
             const level1 = categories.level1.find(c => c.name === food.categoryLevel1);
             if (level1) {
                 document.getElementById('categoryLevel1').value = level1.id;
@@ -1109,6 +1111,7 @@
             const foodData = {
                 name: document.getElementById('name').value,
                 alias: document.getElementById('alias').value.split(',').map(s => s.trim()).filter(s => s),
+                image: document.getElementById('image').value,
                 categoryLevel1: level1Obj ? level1Obj.name : '',
                 categoryLevel2: level2Obj ? level2Obj.name : '',
                 effect: document.getElementById('effect').value,
@@ -1357,8 +1360,14 @@
         }
         
         function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
+            if (str === undefined || str === null) return '';
+            // 如果是数组，先转成字符串（用顿号连接）
+            if (Array.isArray(str)) {
+                str = str.join('、');
+            }
+            // 确保是字符串
+            const s = String(str);
+            return s.replace(/[&<>]/g, function(m) {
                 if (m === '&') return '&amp;';
                 if (m === '<') return '&lt;';
                 if (m === '>') return '&gt;';

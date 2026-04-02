@@ -301,7 +301,7 @@
         
         .badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
@@ -310,7 +310,7 @@
         .badge-green { background: #d1fae5; color: #065f46; }
         .badge-yellow { background: #fed7aa; color: #92400e; }
         .badge-red { background: #fee2e2; color: #991b1b; }
-        .badge-high-protein { background: #dbeafe; color: #1e40af; }
+        .badge-high-protein { font-size: 14px; }
         
         .modal {
             display: none;
@@ -575,6 +575,41 @@
         .toast.info {
             background: #8b5cf6;  /* 紫色 */
         }
+        /* 图片预览浮层 */
+        .image-preview {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 8px;
+            z-index: 10001;
+            display: none;
+            pointer-events: none;
+        }
+        .image-preview img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .image-preview .placeholder {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border-radius: 8px;
+            color: #9ca3af;
+        }
+        .image-preview .placeholder span:first-child {
+            font-size: 48px;
+        }
+        .image-preview .placeholder span:last-child {
+            font-size: 12px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <!-- Toast 提示 -->
@@ -617,7 +652,7 @@
                         <div class="filter-group"><label>一级分类</label><select id="filterCategory1"><option value="all">全部</option></select></div>
                         <div class="filter-group"><label>二级分类</label><select id="filterCategory2"><option value="all">全部</option></select></div>
                         <div class="filter-group"><label>区块</label><select id="filterBlock"><option value="all">全部</option><option value="green">🟢 绿灯食品</option><option value="yellow">🟡 黄灯食品</option><option value="red">🔴 红灯食品</option></select></div>
-                        <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">🥩 高蛋白</option><option value="low">❌ 非高蛋白</option></select></div>
+                        <div class="filter-group"><label>高蛋白</label><select id="filterProtein"><option value="all">全部</option><option value="high">✅ 是</option><option value="low">❌ 否</option></select></div>
                     </div>
                 </div>
                 
@@ -626,7 +661,7 @@
                 <div class="food-table-wrapper">
                     <table>
                         <thead>
-                            <tr><th>菜名</th><th>分类</th><th>GI值</th><th>区块</th><th>蛋白质(g/100g)</th><th>高蛋白</th><th>操作</th> </thead>
+                            <th>图片</th><th>菜名</th><th>GI值</th><th>区块</th><th>蛋白质(g/100g)</th><th>高蛋白</th><th>操作</th> </thead>
                         <tbody id="foodTableBody"></tbody>
                     </table>
                     <div id="foodPagination" class="pagination"></div>
@@ -645,9 +680,11 @@
             <div class="modal-header"><h3 id="foodModalTitle">添加食品</h3><span class="close-modal" onclick="closeFoodModal()">&times;</span></div>
             <form id="foodForm">
                 <input type="hidden" id="foodId">
-                <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
-                <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用英文逗号分隔，如：土豆,马铃薯,洋芋"></div>
-                <div class="form-group"><label>图片URL</label><input type="text" id="image" placeholder="输入图片Url"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>菜名 *</label><input type="text" id="name" required></div>
+                    <div class="form-group"><label>别名</label><input type="text" id="alias" placeholder="多个别名用英文逗号分隔，如：土豆,马铃薯,洋芋"></div>
+                </div>
+                <div class="form-group"><label>图片URL</label><input type="text" id="image" placeholder="输入图片Url" onmouseenter="showImagePreviewFromInput(event)" onmouseleave="hideImagePreview()"></div>
                 <div class="form-row">
                     <div class="form-group"><label>一级分类 *</label><select id="categoryLevel1" required onchange="updateSubcategories()"><option value="">请选择</option></select></div>
                     <div class="form-group"><label>二级分类</label><select id="categoryLevel2"><option value="">请先选择一级分类</option></select></div>
@@ -659,7 +696,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>蛋白质含量 (g/100g)</label><input type="number" id="protein" step="0.1" oninput="autoCheckHighProtein()"></div>
-                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="isHighProtein"><label>🥩 高蛋白食品</label></div><div class="help-text" id="proteinHint">≥10g/100g 会自动勾选</div></div>
+                    <div class="form-group"><div class="checkbox-group"><input type="checkbox" id="isHighProtein"><label>✅ 是食品</label></div><div class="help-text" id="proteinHint">≥10g/100g 会自动勾选</div></div>
                 </div>
                 <button type="submit" class="submit-btn">保存</button>
             </form>
@@ -711,6 +748,64 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 2000);
+        }
+
+        // ==================== 图片预览功能 ====================
+        let previewTimeout;
+
+        function showImagePreview(event, imageUrl, altText) {
+            if (previewTimeout) clearTimeout(previewTimeout);
+            const preview = document.getElementById('imagePreview');
+            if (!preview) {
+                const newPreview = document.createElement('div');
+                newPreview.id = 'imagePreview';
+                newPreview.className = 'image-preview';
+                document.body.appendChild(newPreview);
+            }
+            const previewEl = document.getElementById('imagePreview');
+            if (!imageUrl || imageUrl.trim() === '') {
+                previewEl.innerHTML = '<div class="placeholder"><span>🥗</span><span>暂无图片</span></div>';
+            } else {
+                previewEl.innerHTML = `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(altText)}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'placeholder\'><span>🥗</span><span>暂无图片</span></div>'">`;
+            }
+            previewEl.style.display = 'block';
+            
+            // 获取鼠标位置
+            let left = event.clientX + 15;
+            let top = event.clientY + 15;
+            
+            // 如果右侧空间不够，显示在鼠标左侧
+            const previewWidth = 220; // 预览框宽度 + 边距
+            if (left + previewWidth > window.innerWidth) {
+                left = event.clientX - previewWidth - 15;
+            }
+            // 如果下方空间不够，显示在鼠标上方
+            const previewHeight = 220;
+            if (top + previewHeight > window.innerHeight) {
+                top = event.clientY - previewHeight - 15;
+            }
+            
+            previewEl.style.left = left + 'px';
+            previewEl.style.top = top + 'px';
+        }
+
+        function showImagePreviewFromInput(event) {
+            // 获取鼠标位置和图片URL
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const imageUrl = event.target.value;
+            
+            // 用当前鼠标位置显示预览
+            const fakeEvent = { clientX: mouseX, clientY: mouseY };
+            showImagePreview(fakeEvent, imageUrl, '预览');
+        }
+
+        function hideImagePreview() {
+            if (previewTimeout) clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(() => {
+                const preview = document.getElementById('imagePreview');
+                if (preview) preview.style.display = 'none';
+            }, 300);
         }
 
         // ==================== 配置 ====================
@@ -793,19 +888,27 @@
         }
 
         async function saveFoodsToAPI() {
-            const token = window.adminToken || localStorage.getItem('admin_token');
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            if (token) {
-                headers['Authorization'] = 'Basic ' + token;
-            }
+            const token = localStorage.getItem('admin_token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Basic ' + token;
             
-            await fetch(API_BASE + '/api/foods', {
+            const response = await fetch(API_BASE + '/api/foods', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(foods)
             });
+            
+            if (response.status === 401) {
+                showToast('登录已过期，请重新登录', 'error');
+                setTimeout(() => logout(), 1500);
+                throw new Error('Unauthorized');
+            }
+            
+            if (!response.ok) {
+                throw new Error('Network error');
+            }
+            
+            return response;
         }
         
         function getFilteredFoods() {
@@ -851,10 +954,21 @@
                 const blockClass = f.block === 'green' ? 'badge-green' : (f.block === 'yellow' ? 'badge-yellow' : 'badge-red');
                 const blockText = f.block === 'green' ? '绿灯' : (f.block === 'yellow' ? '黄灯' : '红灯');
                 const proteinDisplay = f.protein ? f.protein + 'g' : '-';
-                const highProteinBadge = f.isHighProtein ? '<span class="badge badge-high-protein">🥩 高蛋白</span>' : '-';
+                const highProteinBadge = f.isHighProtein ? '<span class=" badge-high-protein">✅ 是</span>' : '-';
                 html += '<tr>';
+                let imageHtml = '';
+                if (f.image && f.image.trim() !== '') {
+                    imageHtml = `<img src="${escapeHtml(f.image)}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;cursor:pointer;display:block;margin:0;" 
+                        onmouseenter="showImagePreview(event, '${escapeHtml(f.image)}', '${escapeHtml(f.name)}')" 
+                        onmouseleave="hideImagePreview()">`;
+                } else {
+                    imageHtml = `<div style="width:40px;height:40px;background:#f3f4f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;margin:0;" 
+                        onmouseenter="showImagePreview(event, '', '${escapeHtml(f.name)}')" 
+                        onmouseleave="hideImagePreview()">🥗</div>`;
+                }
+                html += '<td style="text-align:center;vertical-align:middle;">' + imageHtml + '<\/td>';
                 html += '<td><strong>' + escapeHtml(f.name) + '</strong><br><span style="font-size:12px;color:#9ca3af;">' + escapeHtml(f.alias || '无别名') + '</span></td>';
-                html += '<td>' + escapeHtml(f.categoryLevel1) + (f.categoryLevel2 ? ' > ' + escapeHtml(f.categoryLevel2) : '') + '</td>';
+                // html += '<td>' + escapeHtml(f.categoryLevel1) + (f.categoryLevel2 ? ' > ' + escapeHtml(f.categoryLevel2) : '') + '</td>';
                 html += '<td>' + (f.gi || '-') + '</td>';
                 html += '<td><span class="badge ' + blockClass + '">' + blockText + '</span></td>';
                 html += '<td>' + proteinDisplay + '</td>';
@@ -1098,8 +1212,35 @@
         async function deleteFoodItem(id) {
             if (!confirm('确定删除这个食品吗？')) return;
             foods = foods.filter(f => f.id !== id);
-            await saveFoodsToAPI();
-            renderFoods();
+            
+            try {
+                const token = localStorage.getItem('admin_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = 'Basic ' + token;
+                
+                const response = await fetch(API_BASE + '/api/foods', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(foods)
+                });
+                
+                if (response.status === 401) {
+                    showToast('登录已过期，请重新登录', 'error');
+                    setTimeout(() => logout(), 1500);
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('网络错误');
+                }
+                
+                renderFoods();
+                showToast('✅ 删除成功', 'success');
+                
+            } catch(e) {
+                console.error('删除失败:', e);
+                showToast('❌ 删除失败，请重试', 'error');
+            }
         }
         
         async function saveFood(e) {
@@ -1120,6 +1261,8 @@
                 protein: parseFloat(document.getElementById('protein').value) || null,
                 isHighProtein: document.getElementById('isHighProtein').checked
             };
+            
+            // 添加/更新数据
             if (id) {
                 const index = foods.findIndex(f => f.id === id);
                 if (index !== -1) { foodData.id = id; foods[index] = foodData; }
@@ -1127,10 +1270,40 @@
                 foodData.id = Date.now().toString();
                 foods.push(foodData);
             }
-            await saveFoodsToAPI();
-            closeFoodModal();
-            currentPage = 1;
-            renderFoods();
+            
+            // 保存到 API
+            try {
+                const token = localStorage.getItem('admin_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = 'Basic ' + token;
+                
+                const response = await fetch(API_BASE + '/api/foods', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(foods)
+                });
+                
+                if (response.status === 401) {
+                    // token 失效，退出登录
+                    showToast('登录已过期，请重新登录', 'error');
+                    setTimeout(() => logout(), 1500);
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error('网络错误');
+                }
+                
+                // 成功
+                closeFoodModal();
+                currentPage = 1;
+                renderFoods();
+                showToast(id ? '✅ 编辑成功' : '✅ 添加成功', 'success');
+                
+            } catch(e) {
+                console.error('保存失败:', e);
+                showToast(id ? '❌ 编辑失败，请重试' : '❌ 添加失败，请重试', 'error');
+            }
         }
         
         function openCategoryModal(type, parentId = null) {

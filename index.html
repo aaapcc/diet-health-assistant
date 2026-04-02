@@ -123,7 +123,7 @@
             <ul class="tip-list">
                 <li>按照医嘱<strong>海带汤</strong>、<strong>🎃南瓜</strong>绝对不能吃；</li>
             </ul>
-            <p><strong>🔴 红灯食品（少吃或不吃，尽量避免），但绝不能单独吃。</strong></p>
+            <p><strong>🔴 红灯食品（不是完全不能吃），但绝不能单独吃。</strong></p>
             <ul class="tip-list">
                 <li>比如<strong>馒头</strong>必须搭配<strong>🥚鸡蛋</strong>或<strong>🥛牛奶</strong>；</li>
                 <li>吃<strong>🍚米饭</strong>，必须先吃足量的<strong>蔬菜</strong>和<strong>蛋白质（鱼/肉/豆腐）</strong>等，降低整体的升糖速度。</li>
@@ -132,9 +132,10 @@
             <ul class="tip-list">
                 <li>可少量作为配菜或调味蔬菜使用，不宜大量单独食用。</li>
             </ul>
-            <p><strong>🟢 绿灯食品（推荐选择），“能吃”不等于“可多吃”，吃多了血糖照样会高。</strong></p>
+            <p><strong>🟢 绿灯食品（推荐选择），“能吃”但不等于“可多吃”，吃多了血糖照样会高。</strong></p>
             <ul class="tip-list">
                 <li>主食总量要控制，每餐大约一个拳头大小。</li>
+                <li>感觉饱了就停止，不要吃撑。</li>
             </ul>
             <div class="checkbox-row">
                 <input type="checkbox" id="dontShowToday"> <label for="dontShowToday">今天不再显示</label>
@@ -446,7 +447,7 @@
             } else if (food.block === 'yellow') {
                 blockHint = '<div class="tips yellow">🟡 黄灯食品（适量吃，注意分量）。</div>';
             } else if (food.block === 'red') {
-                blockHint = '<div class="tips red">🔴 红灯食品（少吃或不吃，尽量避免）。不是完全不能吃，但绝不能单独吃。</div>';
+                blockHint = '<div class="tips red">🔴 红灯食品（不是完全不能吃），但绝不能单独吃。</div>';
             } else if (food.block === 'black') {
                 blockHint = '<div class="tips black">🚫 不能吃（禁止，绝对不能吃）。</div>';
             }
